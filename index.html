@@ -1,0 +1,1179 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ehliyet Çalışma Uygulaması</title>
+<link rel="icon" type="image/png" href="signs/ef1_001.png">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Segoe UI', 'Yu Gothic', sans-serif; background: #12121f; color: #e8e8f0; min-height: 100vh; }
+
+header { background: #1a1a30; padding: 14px 20px; text-align: center; border-bottom: 2px solid #2a2a50; }
+header h1 { color: #ff6b8a; font-size: 1.35em; }
+header p { color: #888; font-size: 0.82em; margin-top: 4px; }
+
+nav { display: flex; justify-content: center; gap: 8px; padding: 10px; background: #1a1a30; flex-wrap: wrap; border-bottom: 1px solid #2a2a50; }
+nav button { padding: 8px 16px; border: 2px solid #2a2a50; background: transparent; color: #bbb; cursor: pointer; border-radius: 20px; font-size: 0.88em; transition: all 0.2s; }
+nav button.active, nav button:hover { background: #2a2a50; color: #ff6b8a; border-color: #ff6b8a; }
+
+.tab { display: none; padding: 18px; max-width: 920px; margin: 0 auto; }
+.tab.active { display: block; }
+
+/* ---- SECTION BUTTONS ---- */
+.section-btns { display: flex; gap: 10px; margin-bottom: 18px; flex-wrap: wrap; }
+.sec-btn { padding: 10px 22px; border-radius: 8px; border: 2px solid #2a2a50; background: #1a1a30; color: #bbb; cursor: pointer; font-size: 0.93em; transition: all 0.2s; }
+.sec-btn.active { background: #ff6b8a; border-color: #ff6b8a; color: #fff; font-weight: bold; }
+.sec-btn:hover:not(.active) { border-color: #ff6b8a; color: #ff6b8a; }
+
+.lesson-group { display: none; }
+.lesson-group.active { display: block; }
+
+.lesson-section-title { color: #ff6b8a; font-size: 1.05em; margin: 10px 0 5px; border-left: 3px solid #ff6b8a; padding-left: 10px; font-weight: bold; }
+.lesson-section-sub { color: #888; font-size: 0.8em; margin-left: 13px; margin-bottom: 12px; }
+
+.lesson-item { background: #1a1a30; border: 1px solid #2a2a50; border-radius: 8px; margin-bottom: 7px; padding: 11px 14px; transition: all 0.15s; display: flex; align-items: center; gap: 12px; }
+.lesson-item:hover { border-color: #2a2a50; background: #1a1a30; }
+.lesson-num { color: #ff6b8a; font-size: 0.78em; min-width: 42px; font-family: monospace; }
+.lesson-jp { font-size: 0.92em; flex: 1; }
+.lesson-en { color: #6aabff; font-size: 0.78em; margin-top: 2px; }
+
+/* ---- SORU LİSTESİ ---- */
+.q-item { background:#1a1a30; border:1px solid #2a2a50; border-radius:8px; margin-bottom:7px; padding:11px 14px; cursor:pointer; display:flex; align-items:center; gap:10px; transition:all 0.15s; }
+.q-item:hover { border-color:#ff6b8a; background:#1f1f3a; }
+.q-num { color:#ff6b8a; font-size:0.78em; min-width:26px; font-family:monospace; }
+.q-jp { font-size:0.9em; flex:1; }
+.q-en { color:#6aabff; font-size:0.78em; flex:1; }
+.q-arrow { color:#666; font-size:0.8em; white-space:nowrap; }
+.quiz-card { background:#1a1a30; border:1px solid #2a2a50; border-radius:10px; padding:14px 16px; margin-bottom:12px; transition:border-color 0.2s,background 0.2s; }
+.quiz-card.quiz-correct { border-color:#4caf50; background:#0d2b0d; }
+.quiz-card.quiz-wrong   { border-color:#e53935; background:#2b0d0d; }
+.quiz-num  { color:#ff6b8a; font-size:0.75em; font-weight:700; margin-bottom:4px; }
+.quiz-jp   { font-size:1.05em; line-height:1.5; margin-bottom:5px; }
+.quiz-hint { color:#6aabff; font-size:0.77em; margin-bottom:10px; }
+.quiz-btns { display:flex; gap:12px; margin-top:8px; }
+.qbtn { flex:1; padding:10px 0; font-size:1.3em; font-weight:700; border:2px solid #444; border-radius:8px; cursor:pointer; background:#0d0d1f; color:#fff; transition:all 0.15s; }
+.qbtn-maru { border-color:#4caf50; color:#4caf50; }
+.qbtn-batu { border-color:#e53935; color:#e53935; }
+.qbtn:hover:not(:disabled) { opacity:0.85; transform:scale(1.04); }
+.qbtn:disabled { opacity:0.45; cursor:default; transform:none; }
+.quiz-feedback { margin-top:8px; font-size:0.88em; min-height:16px; }
+.qfb-ok { color:#4caf50; font-weight:700; }
+.qfb-ng { color:#e53935; font-weight:700; }
+.quiz-score-bar { background:#111128; border:1px solid #2a2a50; border-radius:8px; padding:8px 14px; margin-bottom:14px; display:flex; justify-content:space-between; align-items:center; font-size:0.88em; }
+.quiz-score-val { color:#ff6b8a; font-weight:700; font-size:1.05em; }
+.quiz-reset-btn { background:none; border:1px solid #555; color:#aaa; border-radius:6px; padding:4px 10px; font-size:0.82em; cursor:pointer; }
+.quiz-reset-btn:hover { border-color:#ff6b8a; color:#ff6b8a; }
+.quiz-img { display:block; max-width:100%; max-height:220px; border-radius:6px; margin:6px 0 10px; border:1px solid #333; }
+.wb-set-select { display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap; }
+.wb-set-btn { background:#1a1a30; border:1px solid #3a3a60; color:#aaa; border-radius:8px; padding:8px 16px; font-size:0.88em; cursor:pointer; transition:all 0.15s; }
+.wb-set-btn.active { border-color:#ff6b8a; color:#ff6b8a; background:#1f1020; }
+.wb-set-btn:hover:not(.active) { border-color:#6aabff; color:#6aabff; }
+
+
+/* ---- FLASHCARD ---- */
+.flashcard-wrap { perspective: 1200px; margin: 16px auto; max-width: 480px; }
+.flashcard { width: 100%; height: 210px; position: relative; transform-style: preserve-3d; transition: transform 0.45s ease; cursor: pointer; }
+.flashcard.flipped { transform: rotateY(180deg); }
+.card-front, .card-back { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 14px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; text-align: center; }
+.card-front { background: linear-gradient(135deg, #1f1f3a, #141428); border: 2px solid #ff6b8a; }
+.card-back { background: linear-gradient(135deg, #8b1a2e, #4a0f1c); border: 2px solid #ff6b8a; transform: rotateY(180deg); }
+.card-jp { font-size: 1.6em; margin-bottom: 10px; color: #fff; }
+.card-hint { font-size: 0.72em; color: #666; }
+.card-reading { font-size: 0.82em; color: #aaa; margin-top: 3px; letter-spacing: 0.04em; }
+.td-reading { font-size: 0.77em; color: #999; font-style: italic; }
+.card-en { font-size: 1.1em; font-weight: bold; margin-bottom: 8px; color: #fff; }
+.card-tr { font-size: 0.88em; color: #ffccd5; margin-top: 6px; line-height: 1.4; }
+
+.card-nav { display: flex; align-items: center; justify-content: center; gap: 16px; margin: 12px 0; }
+.card-nav button, .card-extra-btn { background: #1a1a30; border: 2px solid #2a2a50; color: #bbb; padding: 7px 18px; border-radius: 18px; cursor: pointer; font-size: 0.88em; transition: all 0.2s; }
+.card-nav button:hover, .card-extra-btn:hover { border-color: #ff6b8a; color: #ff6b8a; }
+.card-progress { color: #888; font-size: 0.82em; min-width: 80px; text-align: center; }
+
+/* ---- VOCAB TABLE ---- */
+.mode-toggle { display: flex; gap: 8px; margin-bottom: 14px; }
+.mode-btn { padding: 7px 15px; border-radius: 8px; border: 1px solid #2a2a50; background: #1a1a30; color: #888; cursor: pointer; font-size: 0.84em; transition: all 0.2s; }
+.mode-btn.active { background: #ff6b8a; border-color: #ff6b8a; color: #fff; }
+
+#vocab-table-view, #vocab-card-view { display: none; }
+#vocab-table-view.active, #vocab-card-view.active { display: block; }
+
+.search-box { width: 100%; padding: 10px 14px; background: #1a1a30; border: 2px solid #2a2a50; border-radius: 8px; color: #eee; font-size: 0.95em; margin-bottom: 12px; outline: none; }
+.search-box:focus { border-color: #ff6b8a; }
+
+.alpha-filter { display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap; }
+.alpha-filter button { padding: 4px 12px; border-radius: 14px; border: 1px solid #2a2a50; background: #1a1a30; color: #888; cursor: pointer; font-size: 0.8em; transition: all 0.2s; }
+.alpha-filter button.active { background: #2a2a50; color: #ff6b8a; border-color: #ff6b8a; }
+.alpha-filter button:hover { border-color: #ff6b8a; color: #ff6b8a; }
+
+.vocab-table { width: 100%; border-collapse: collapse; font-size: 0.88em; }
+.vocab-table th { background: #2a2a50; color: #ff6b8a; padding: 9px 10px; text-align: left; }
+.vocab-table td { padding: 9px 10px; border-bottom: 1px solid #1f1f35; vertical-align: top; }
+.vocab-table tr:hover td { background: #1f1f35; }
+.td-jp { font-size: 1.0em; color: #f0f0ff; }
+.td-en { color: #6aabff; }
+.td-tr { color: #ffc870; line-height: 1.4; }
+
+/* ---- ENGLISH GUIDE ---- */
+.eng-section { background: #1a1a30; border-radius: 10px; padding: 14px 16px; margin-bottom: 14px; border-left: 3px solid #ff6b8a; }
+.eng-section h3 { color: #ff6b8a; margin-bottom: 11px; font-size: 0.92em; }
+.pattern { margin-bottom: 10px; }
+.en-text { background: #0f0f22; padding: 7px 11px; border-radius: 5px; font-family: monospace; font-size: 0.93em; color: #88ffcc; margin-bottom: 3px; }
+.tr-text { font-size: 0.83em; color: #ffc870; padding: 0 4px; }
+
+/* ---- STATS BAR ---- */
+.stats-bar { display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+.stat-chip { background: #1a1a30; border: 1px solid #2a2a50; border-radius: 20px; padding: 5px 14px; font-size: 0.8em; color: #888; }
+.stat-chip span { color: #ff6b8a; font-weight: bold; }
+
+/* ---- LEVHALAR ---- */
+.signs-filter-bar { display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap; align-items:center; }
+.signs-filter-bar input { flex:1; min-width:160px; background:#1a1a30; border:1px solid #2a2a50; color:#f0f0ff; padding:7px 12px; border-radius:7px; font-size:0.9em; }
+.signs-filter-bar input:focus { outline:none; border-color:#ff6b8a; }
+.sign-cat-btn { padding:6px 14px; border-radius:7px; border:2px solid #444; background:none; color:#aaa; cursor:pointer; font-size:0.82em; transition:all .15s; white-space:nowrap; }
+.sign-cat-btn.active { background:#ff6b8a; border-color:#ff6b8a; color:#fff; }
+.sign-cat-btn:hover:not(.active) { border-color:#ff6b8a; color:#ff6b8a; }
+.signs-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:12px; }
+.sign-card { background:#1a1a30; border:1px solid #2a2a50; border-radius:10px; padding:12px 10px; text-align:center; transition:border-color .2s,transform .15s; cursor:default; }
+.sign-card:hover { border-color:#ff6b8a; transform:translateY(-2px); }
+.sign-card img { width:80px; height:80px; object-fit:contain; margin-bottom:8px; display:block; margin-left:auto; margin-right:auto; }
+.sign-num { color:#555; font-size:0.7em; margin-bottom:3px; }
+.sign-jp  { font-size:0.82em; color:#f0f0ff; line-height:1.3; margin-bottom:2px; font-weight:600; }
+.sign-jpkana { font-size:0.72em; color:#888; margin-bottom:3px; }
+.sign-en  { font-size:0.74em; color:#6aabff; line-height:1.3; margin-bottom:5px; }
+.sign-tr  { font-size:0.75em; color:#ffc870; line-height:1.4; border-top:1px solid #2a2a50; padding-top:5px; }
+.sign-cat-badge { display:inline-block; font-size:0.67em; padding:2px 7px; border-radius:10px; margin-bottom:5px; }
+.badge-reg { background:#3a1a1a; color:#ff8888; border:1px solid #6a2a2a; }
+.badge-des { background:#1a2a1a; color:#88ff88; border:1px solid #2a6a2a; }
+.badge-aux { background:#1a1a3a; color:#8888ff; border:1px solid #2a2a6a; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🚗 Ehliyet Çalışma Uygulaması</h1>
+  <p>教習項目 11 · 12 · 13 &nbsp;|&nbsp; さく引 Kelime Kartları · İngilizce Rehberi · Sorular · Levhalar · 仮免前 模擬</p>
+</header>
+
+<nav>
+  <button class="active" onclick="showTab('dersler', this)">📚 Dersler (11-13)</button>
+  <button onclick="showTab('kelimeler', this)">🃏 Kelimeler (用語集)</button>
+  <button onclick="showTab('ingilizce', this)">🇬🇧 İngilizce Rehberi</button>
+  <button onclick="showTab('sorular', this)">📝 Sorular</button>
+  <button onclick="showTab('levhalar', this)">🚦 Levhalar</button>
+  <button onclick="showTab('sinav', this)">🎯 仮免前 模擬</button>
+</nav>
+
+<!-- ==================== TAB 1: DERSLER ==================== -->
+<div class="tab active" id="tab-dersler">
+    <div class="section-btns">
+    <button class="sec-btn active" onclick="showSection(11, this)">教習項目 11<br><small>追い越し / Overtaking</small></button>
+    <button class="sec-btn" onclick="showSection(12, this)">教習項目 12<br><small>免許 / License</small></button>
+    <button class="sec-btn" onclick="showSection(13, this)">教習項目 13<br><small>AT車・死角 / AT & Blind Spots</small></button>
+  </div>
+
+  <div class="lesson-group active" id="section11">
+    <div class="lesson-section-title">教習項目 11 — Overtaking (追い越し)</div>
+    <div class="lesson-section-sub">Overtaking Rules · Forbidden Places · Method · Side Clearance</div>
+  </div>
+  <div class="lesson-group" id="section12">
+    <div class="lesson-section-title">教習項目 12 — Driving License (免許)</div>
+    <div class="lesson-section-sub">License Types (Type 1/2) · Provisional · Towing · Unlicensed Driving</div>
+  </div>
+  <div class="lesson-group" id="section13">
+    <div class="lesson-section-title">教習項目 13 — AT Vehicle, Blind Spots &amp; Defensive Driving</div>
+    <div class="lesson-section-sub">Automatic Transmission · Blind Spot Types · Defensive Driving · Road Position</div>
+  </div>
+</div>
+
+<!-- ==================== TAB 2: KELIMELER ==================== -->
+<div class="tab" id="tab-kelimeler">
+  <div class="mode-toggle">
+    <button class="mode-btn active" onclick="setVocabMode('card', this)">🃏 Flashcard</button>
+    <button class="mode-btn" onclick="setVocabMode('table', this)">📋 Liste</button>
+  </div>
+
+  <!-- CARD MODE -->
+  <div id="vocab-card-view" class="active">
+    <div class="alpha-filter" id="card-alpha-filter">
+      <button class="active" onclick="filterCardAlpha('all', this)">Tümü</button>
+      <button onclick="filterCardAlpha('あ', this)">あ</button>
+      <button onclick="filterCardAlpha('か', this)">か</button>
+      <button onclick="filterCardAlpha('さ', this)">さ</button>
+      <button onclick="filterCardAlpha('た', this)">た</button>
+      <button onclick="filterCardAlpha('な', this)">な</button>
+      <button onclick="filterCardAlpha('は', this)">は</button>
+      <button onclick="filterCardAlpha('ま', this)">ま</button>
+      <button onclick="filterCardAlpha('や', this)">や</button>
+      <button onclick="filterCardAlpha('ら', this)">ら</button>
+    </div>
+    <div class="flashcard-wrap">
+      <div class="flashcard" id="flashcard" onclick="flipCard()">
+        <div class="card-front">
+          <div class="card-jp" id="card-jp">-</div>
+          <div class="card-hint">👆 Tıkla → İngilizce / Türkçe açıklama</div>
+        </div>
+        <div class="card-back">
+          <div class="card-en" id="card-en"></div>
+          <div class="card-tr" id="card-tr"></div>
+        </div>
+      </div>
+    </div>
+    <div class="card-nav">
+      <button onclick="prevCard()">◀ Önceki</button>
+      <span class="card-progress" id="card-progress">1 / 1</span>
+      <button onclick="nextCard()">Sonraki ▶</button>
+    </div>
+    <div style="text-align:center; margin-top: 8px;">
+      <button class="card-extra-btn" onclick="shuffleCards()">🔀 Karıştır</button>
+    </div>
+  </div>
+
+  <!-- TABLE MODE -->
+  <div id="vocab-table-view">
+    <input type="text" class="search-box" id="vocab-search" placeholder="Ara... (日本語 / English / Türkçe)" oninput="filterVocabTable()">
+    <div class="alpha-filter" id="table-alpha-filter">
+      <button class="active" onclick="filterTableAlpha('all', this)">Tümü</button>
+      <button onclick="filterTableAlpha('あ', this)">あ</button>
+      <button onclick="filterTableAlpha('か', this)">か</button>
+      <button onclick="filterTableAlpha('さ', this)">さ</button>
+      <button onclick="filterTableAlpha('た', this)">た</button>
+      <button onclick="filterTableAlpha('な', this)">な</button>
+      <button onclick="filterTableAlpha('は', this)">は</button>
+      <button onclick="filterTableAlpha('ま', this)">ま</button>
+      <button onclick="filterTableAlpha('や', this)">や</button>
+      <button onclick="filterTableAlpha('ら', this)">ら</button>
+    </div>
+    <table class="vocab-table">
+      <thead><tr><th>日本語</th><th>English</th><th>Türkçe Açıklama</th></tr></thead>
+      <tbody id="vocab-tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ==================== TAB 3: INGILIZCE ==================== -->
+<div class="tab" id="tab-ingilizce">
+
+  <div class="eng-section">
+    <h3>📌 Sınav Sorusu Temel Yapıları</h3>
+    <div class="pattern"><div class="en-text">You must / must not + [action] when [condition].</div><div class="tr-text">→ [koşul] olduğunda [eylem] yapmalısın / yapmamalısın.</div></div>
+    <div class="pattern"><div class="en-text">It is (not) necessary to + [action].</div><div class="tr-text">→ [eylem] yapman gerekir / gerekmez.</div></div>
+    <div class="pattern"><div class="en-text">When [condition], [action] is prohibited / permitted.</div><div class="tr-text">→ [koşul] olduğunda [eylem] yasaktır / serbesttir.</div></div>
+    <div class="pattern"><div class="en-text">Which of the following statements is CORRECT / INCORRECT?</div><div class="tr-text">→ Aşağıdaki ifadelerden hangisi DOĞRU / YANLIŞ?</div></div>
+  </div>
+
+  <div class="eng-section">
+    <h3>🔑 Kritik Fiiller (Sınavda Çok Çıkar)</h3>
+    <div class="pattern"><div class="en-text">yield to / give way to</div><div class="tr-text">→ yol vermek</div></div>
+    <div class="pattern"><div class="en-text">come to a complete stop</div><div class="tr-text">→ tamamen durmak (tam duruş yapmak)</div></div>
+    <div class="pattern"><div class="en-text">keep / maintain a safe (following) distance</div><div class="tr-text">→ güvenli takip mesafesini korumak</div></div>
+    <div class="pattern"><div class="en-text">overtake / pass another vehicle</div><div class="tr-text">→ geçmek (bir aracın önüne geçmek)</div></div>
+    <div class="pattern"><div class="en-text">change lanes / merge into traffic</div><div class="tr-text">→ şerit değiştirmek / trafiğe dahil olmak</div></div>
+    <div class="pattern"><div class="en-text">signal / indicate a turn</div><div class="tr-text">→ sinyal vermek / dönüşü belirtmek</div></div>
+    <div class="pattern"><div class="en-text">pull over to the side of the road</div><div class="tr-text">→ yol kenarına çekmek</div></div>
+    <div class="pattern"><div class="en-text">proceed with caution / drive carefully</div><div class="tr-text">→ dikkatli ilerlemek</div></div>
+    <div class="pattern"><div class="en-text">dim / dip the headlights (use low beams)</div><div class="tr-text">→ kısa huzme kullanmak (kısmak)</div></div>
+    <div class="pattern"><div class="en-text">steer into the skid</div><div class="tr-text">→ kayma yönünde direksiyon çevirmek</div></div>
+  </div>
+
+  <div class="eng-section">
+    <h3>🔑 Kritik Sıfat ve Zarflar</h3>
+    <div class="pattern"><div class="en-text">immediately / at once / right away</div><div class="tr-text">→ hemen, derhal</div></div>
+    <div class="pattern"><div class="en-text">gradually / slowly / step by step</div><div class="tr-text">→ yavaş yavaş, kademeli olarak</div></div>
+    <div class="pattern"><div class="en-text">sufficiently / adequately / properly</div><div class="tr-text">→ yeterince, gereği gibi</div></div>
+    <div class="pattern"><div class="en-text">prohibited / forbidden / not allowed</div><div class="tr-text">→ yasak, izin verilmez</div></div>
+    <div class="pattern"><div class="en-text">obligatory / required / mandatory / compulsory</div><div class="tr-text">→ zorunlu, mecburi</div></div>
+    <div class="pattern"><div class="en-text">slippery / wet / icy / muddy</div><div class="tr-text">→ kaygan / ıslak / buzlu / çamurlu</div></div>
+    <div class="pattern"><div class="en-text">oncoming traffic / oncoming vehicle</div><div class="tr-text">→ karşıdan gelen trafik/araç</div></div>
+  </div>
+
+  <div class="eng-section">
+    <h3>🚦 Trafik Terimleri EN → TR Hızlı Tablo</h3>
+    <div class="pattern"><div class="en-text">intersection</div><div class="tr-text">→ 交差点 kavşak</div></div>
+    <div class="pattern"><div class="en-text">pedestrian crossing / crosswalk</div><div class="tr-text">→ 横断歩道 yaya geçidi</div></div>
+    <div class="pattern"><div class="en-text">stopping distance = reaction distance + braking distance</div><div class="tr-text">→ 停止距離 = 空走距離 + 制動距離 — hız arttıkça uzar!</div></div>
+    <div class="pattern"><div class="en-text">blind spot</div><div class="tr-text">→ 死角 kör nokta</div></div>
+    <div class="pattern"><div class="en-text">right of way</div><div class="tr-text">→ geçiş önceliği</div></div>
+    <div class="pattern"><div class="en-text">lane</div><div class="tr-text">→ 車両通行帯 trafik şeridi</div></div>
+    <div class="pattern"><div class="en-text">road shoulder / roadside</div><div class="tr-text">→ 路肩 / 路側帯 banket / kenar şerit</div></div>
+    <div class="pattern"><div class="en-text">expressway / motorway</div><div class="tr-text">→ 高速道路 otoyol</div></div>
+    <div class="pattern"><div class="en-text">emergency vehicle</div><div class="tr-text">→ 緊急自動車 ambulans/itfaiye/polis → yol ver!</div></div>
+    <div class="pattern"><div class="en-text">hazard lights / warning flashers</div><div class="tr-text">→ 非常点滅表示灯 dörtlü flaşör</div></div>
+    <div class="pattern"><div class="en-text">novice driver sign / beginner sign</div><div class="tr-text">→ 初心運転者標識 yeni sürücü işareti (1 yıl)</div></div>
+    <div class="pattern"><div class="en-text">compulsory insurance (CALI)</div><div class="tr-text">→ 強制保険 zorunlu trafik sigortası</div></div>
+    <div class="pattern"><div class="en-text">hydroplaning</div><div class="tr-text">→ ハイドロプレーニング ıslak yolda kayma — hızı düşür!</div></div>
+    <div class="pattern"><div class="en-text">centrifugal force</div><div class="tr-text">→ 遠心力 merkezkaç kuvveti — virajda dışa iter</div></div>
+    <div class="pattern"><div class="en-text">impact force (kinetic energy)</div><div class="tr-text">→ 衝撃力 çarpma kuvveti — hız 2x → etki 4x (kare!)</div></div>
+    <div class="pattern"><div class="en-text">friction force / road grip</div><div class="tr-text">→ 摩擦力 sürtünme kuvveti — ıslak/buzda düşer</div></div>
+    <div class="pattern"><div class="en-text">tram track area</div><div class="tr-text">→ 軌道敷内 tramvay yolu içi</div></div>
+    <div class="pattern"><div class="en-text">inner wheel difference / tail swing</div><div class="tr-text">→ 内輪差 iç tekerlek farkı — büyük araç dönerken içe taşar!</div></div>
+    <div class="pattern"><div class="en-text">two-stage right turn</div><div class="tr-text">→ 二段階右折 2 aşamalı sağa dönüş (moped için)</div></div>
+    <div class="pattern"><div class="en-text">climbing lane</div><div class="tr-text">→ 登坂車線 yokuş çıkış şeridi</div></div>
+    <div class="pattern"><div class="en-text">evaporation phenomenon</div><div class="tr-text">→ 蒸発現象 gece yayaların görünmez olması (karşılıklı farlar)</div></div>
+    <div class="pattern"><div class="en-text">glare (from headlights)</div><div class="tr-text">→ げん惑 farların kamaştırması</div></div>
+    <div class="pattern"><div class="en-text">creep phenomenon (automatic transmission)</div><div class="tr-text">→ クリープ現象 otomatik vites, gaz vermeden yavaşça ilerler</div></div>
+  </div>
+
+  <div class="eng-section">
+    <h3>🎯 Bölüm 11 — Anahtar Noktalar</h3>
+    <div class="pattern"><div class="en-text">Impact force increases with the SQUARE of speed (2x speed → 4x impact).</div><div class="tr-text">→ Çarpma kuvveti hızın KARESIYLE artar: hız 2 kat → etki 4 kat</div></div>
+    <div class="pattern"><div class="en-text">Stopping distance = reaction distance + braking distance. Both increase with speed.</div><div class="tr-text">→ Durma mesafesi = tepki mesafesi + frenleme mesafesi. Hız arttıkça ikisi de uzar.</div></div>
+    <div class="pattern"><div class="en-text">Dynamic visual acuity decreases as speed increases (you see less clearly when moving fast).</div><div class="tr-text">→ Hız arttıkça hareketli görüş keskinliği (動体視力) düşer</div></div>
+    <div class="pattern"><div class="en-text">Centrifugal force increases sharply on curves — slow down BEFORE the curve.</div><div class="tr-text">→ Virajda merkezkaç kuvveti artar — virajdan ÖNCE yavaşla</div></div>
+    <div class="pattern"><div class="en-text">On motorcycles: body lean into curves, apply brakes before curving, not during.</div><div class="tr-text">→ Motosiklette: virajda eğil, freni virajdan önce uygula</div></div>
+  </div>
+
+  <div class="eng-section">
+    <h3>🎯 Bölüm 12 — Anahtar Noktalar</h3>
+    <div class="pattern"><div class="en-text">When meeting oncoming traffic at night, dim your headlights (switch to low beams).</div><div class="tr-text">→ Gece karşıdan araç gelirken: kısa huzmeye geç</div></div>
+    <div class="pattern"><div class="en-text">In fog: use fog lights + low beams, honk horn, reduce speed.</div><div class="tr-text">→ Siste: sis farı + kısa huzme aç, korna çal, yavaşla</div></div>
+    <div class="pattern"><div class="en-text">If brakes fail on a downhill: shift to low gear, use parking brake gradually, steer into safety barrier.</div><div class="tr-text">→ İnişte fren tutmazsa: düşük vitese geç, el freni kademeli çek</div></div>
+    <div class="pattern"><div class="en-text">If a tire bursts: DO NOT brake suddenly. Grip the steering wheel firmly, reduce speed gradually.</div><div class="tr-text">→ Lastik patlasında: ani fren YAPMA. Direksiyonu sıkı tut, yavaş yavaş dur.</div></div>
+    <div class="pattern"><div class="en-text">In an earthquake: stop slowly, leave keys in the car, evacuate on foot.</div><div class="tr-text">→ Depremde: yavaşça dur, anahtarı bırak, araçtan çık yürü</div></div>
+  </div>
+
+  <div class="eng-section">
+    <h3>🎯 Bölüm 13 — Anahtar Noktalar</h3>
+    <div class="pattern"><div class="en-text">You must carry out a daily inspection BEFORE driving.</div><div class="tr-text">→ Günlük kontrol sürüşten ÖNCE yapılmalı</div></div>
+    <div class="pattern"><div class="en-text">Parking = leaving vehicle OR stopping for more than 5 minutes. Stopping = less than 5 min with someone in the car.</div><div class="tr-text">→ 駐車 park: araçtan ayrılmak veya 5 dk+ beklemek. 停車 durma: 5 dk altı, araçta biri var</div></div>
+    <div class="pattern"><div class="en-text">In an accident: (1) prevent secondary accidents, (2) rescue injured, (3) report to police.</div><div class="tr-text">→ Kazada sıra: ①ikinci kaza önle ②yaralıya yardım ③polise bildir</div></div>
+    <div class="pattern"><div class="en-text">Compulsory insurance (CALI) is mandatory for ALL vehicles. Voluntary insurance is optional but recommended.</div><div class="tr-text">→ Zorunlu sigorta tüm araçlarda olmalı; ihtiyari sigorta isteğe bağlı</div></div>
+    <div class="pattern"><div class="en-text">Compulsory insurance covers bodily injury to OTHERS. It does NOT cover property damage or your own injuries.</div><div class="tr-text">→ Zorunlu sigorta sadece karşı tarafın yaralanma zararını karşılar, mal hasarı veya kendin için değil</div></div>
+  </div>
+
+</div><!-- end tab-ingilizce -->
+
+
+<!-- ==================== TAB 4: SORULAR ==================== -->
+<div class="tab" id="tab-sorular">
+  <div style="background:#1a1a30;border-radius:10px;padding:12px 16px;margin-bottom:14px;border-left:3px solid #ff6b8a;">
+    <b style="color:#ff6b8a">📝 Alıştırma Soruları — 練習問題</b><br>
+    <span style="color:#888;font-size:0.83em">Her ders için ○× soruları. Aşağıdan bölüm seçin ve soruları cevaplayın.</span>
+  </div>
+
+  <div class="section-btns">
+    <button class="sec-btn active" onclick="showQSection(11, this)">教習項目 11<br><small>追い越し (15 soru)</small></button>
+    <button class="sec-btn" onclick="showQSection(12, this)">教習項目 12<br><small>免許 (5 soru)</small></button>
+    <button class="sec-btn" onclick="showQSection(13, this)">教習項目 13<br><small>AT車・死角 (9 soru)</small></button>
+  </div>
+
+  <div id="qsection11" class="q-group active"></div>
+  <div id="qsection12" class="q-group" style="display:none"></div>
+  <div id="qsection13" class="q-group" style="display:none"></div>
+</div><!-- end tab-sorular -->
+
+<!-- ==================== TAB 5: LEVHALAR ==================== -->
+<div class="tab" id="tab-levhalar">
+  <div style="background:#1a1a30;border-radius:10px;padding:12px 16px;margin-bottom:14px;border-left:3px solid #ff6b8a;">
+    <b style="color:#ff6b8a">🚦 Trafik Levhaları — 道路標識 (どうろひょうしき)</b><br>
+    <span style="color:#888;font-size:0.83em">76 levha · 3 kategori: 規制標識 / 指示標識 / 補助標識</span>
+  </div>
+  <div class="signs-filter-bar">
+    <input type="text" id="signs-search" placeholder="Ara... (日本語 / English / Türkçe)" oninput="filterSigns()">
+    <button class="sign-cat-btn active" onclick="filterSignCat('all',this)">Tümü (76)</button>
+    <button class="sign-cat-btn" onclick="filterSignCat('reg',this)">規制標識 (49)</button>
+    <button class="sign-cat-btn" onclick="filterSignCat('des',this)">指示標識 (12)</button>
+    <button class="sign-cat-btn" onclick="filterSignCat('aux',this)">補助標識 (15)</button>
+  </div>
+  <div class="signs-grid" id="signs-grid"></div>
+</div>
+
+<!-- ==================== TAB 6: SINAV SETLERİ ==================== -->
+<div class="tab" id="tab-sinav">
+  <div style="background:#1a1a30;border-radius:10px;padding:12px 16px;margin-bottom:14px;border-left:3px solid #ff6b8a;">
+    <b style="color:#ff6b8a">🎯 仮免前 模擬試験 — Kari-men Öncesi Alıştırma Sınavları</b><br>
+    <span style="color:#888;font-size:0.83em">3 set × 50 soru = 150 ○× sorusu. Set seçin ve cevaplayın.</span>
+  </div>
+  <div class="wb-set-select">
+    <button class="wb-set-btn active" onclick="showWBSet('A', this)">仮免前 Set 1<br><small>50 soru</small></button>
+    <button class="wb-set-btn" onclick="showWBSet('B', this)">仮免前 Set 2<br><small>50 soru</small></button>
+    <button class="wb-set-btn" onclick="showWBSet('C', this)">卒検前 Set 1<br><small>50 soru</small></button>
+  </div>
+  <div id="wb-set-A" class="q-group active"></div>
+  <div id="wb-set-B" class="q-group" style="display:none"></div>
+  <div id="wb-set-C" class="q-group" style="display:none"></div>
+</div>
+
+<script>
+// ===== LESSON DATA =====
+const LESSONS = {
+  11: [
+    {id:'2130', jp:'追い越しの禁止', en:'Overtaking — Overview & Prohibition'},
+    {id:'2131', jp:'追い越しと追い抜きの意味', en:'Meaning of Overtaking vs. Passing'},
+    {id:'2132', jp:'追い越しを禁止する場合', en:'Situations Prohibiting Overtaking'},
+    {id:'2133', jp:'追い越しを禁止する場所', en:'Places Prohibiting Overtaking'},
+    {id:'2134', jp:'右側部分へのはみ出し追い越しの禁止', en:'Prohibiting Crossing into Oncoming Lane'},
+    {id:'2135', jp:'追い越しの方法', en:'How to Overtake'},
+    {id:'2137', jp:'右側追い越しと左側通過', en:'Right-side Overtake & Left-side Pass'},
+    {id:'2138', jp:'路面電車を追い越す場合', en:'Overtaking a Tram / Streetcar'},
+    {id:'2139', jp:'安全な側方間隔の保持', en:'Maintaining Safe Side Clearance'},
+    {id:'2140', jp:'追い越しの運転手順', en:'Step-by-Step Overtaking Procedure'},
+    {id:'2141', jp:'追い越されるときの注意 ①', en:'Caution When Being Overtaken (1)'},
+    {id:'2142', jp:'追い越されるときの注意 ②', en:'Caution When Being Overtaken (2)'},
+    {id:'2144', jp:'側方間隔の保持 ①', en:'Maintaining Side Clearance (1)'},
+    {id:'2145', jp:'側方間隔の保持 ②', en:'Maintaining Side Clearance (2)'},
+    {id:'2146', jp:'障害物があるときの避譲 ①', en:'Yielding Around Obstacles (1)'},
+    {id:'2147', jp:'障害物があるときの避譲 ②', en:'Yielding Around Obstacles (2)'},
+  ],
+  12: [
+    {id:'2149', jp:'運転免許のしくみ', en:'Structure of Driving Licenses'},
+    {id:'2150', jp:'無免許運転の禁止', en:'Prohibition of Unlicensed Driving'},
+    {id:'2151', jp:'運転免許証の携帯と提示', en:'Carrying & Presenting Your License'},
+    {id:'2152', jp:'免許の種類と運転できる自動車など', en:'License Types & Vehicles Permitted'},
+    {id:'2153', jp:'必要な運転経験など', en:'Required Driving Experience'},
+    {id:'2154', jp:'けん引免許', en:'Towing License'},
+    {id:'2155', jp:'仮免許による運転', en:'Driving with a Provisional License'},
+  ],
+  13: [
+    {id:'2184', jp:'オートマチック車の運転', en:'Driving an Automatic (AT) Vehicle'},
+    {id:'2185', jp:'オートマチック車（四輪車）の運転時の注意', en:'Cautions: AT Four-Wheel Vehicle'},
+    {id:'2186', jp:'オートマチック二輪車の運転時の注意', en:'Cautions: AT Motorcycle'},
+    {id:'2198', jp:'二輪車・四輪車からの見えかた ①', en:'Visibility: Motorcycle vs. Car View (1)'},
+    {id:'2199', jp:'二輪車・四輪車からの見えかた ②', en:'Visibility: Motorcycle vs. Car View (2)'},
+    {id:'2200', jp:'死角の事例', en:'Examples of Blind Spots'},
+    {id:'2201', jp:'自動車自体の死角', en:"Vehicle's Own Blind Spots"},
+    {id:'2202', jp:'駐車車両がつくる死角', en:'Blind Spots from Parked Vehicles'},
+    {id:'2203', jp:'交差点での死角', en:'Blind Spots at Intersections'},
+    {id:'2204', jp:'カーブがつくる死角', en:'Blind Spots Created by Curves'},
+    {id:'2205', jp:'防衛的運転方法', en:'Defensive Driving Methods'},
+    {id:'2207', jp:'適切な走行ポジション', en:'Appropriate Road Position'},
+    {id:'2208', jp:'車両間の意思疎通の方法', en:'Communication Between Vehicles'},
+    {id:'2209', jp:'交差点でのパッシング', en:'Flashing Headlights at Intersections'},
+  ]
+};
+
+// ===== VOCAB DATA =====
+const VOCAB = [
+  {jp:'アイドリング・ストップ', en:'Idling stop', tr:'Motor durdurmak (yakıt tasarrufu için)', r:'', k:'あ'},
+  {jp:'暗順応', en:'Dark adaptation', tr:'Karanlığa gözün alışması — tünelde yavaşlamanın nedeni', r:'あんじゅんのう', k:'あ'},
+  {jp:'安全地帯', en:'Safety zone', tr:'Yolda yayalar/bekleyenler için ayrılmış koruma alanı', r:'あんぜんちたい', k:'あ'},
+  {jp:'安全な車間距離', en:'Safe following distance', tr:'Güvenli takip mesafesi (kuru yolda: km/h kadar metre)', r:'あんぜんなしゃかんきょり', k:'あ'},
+  {jp:'アンチロック・ブレーキシステム(ABS)', en:'ABS — Anti-lock Braking System', tr:'Kilitlenme önleyici fren: frenlerken direksiyon kontrolü kaybolmaz', r:'', k:'あ'},
+  {jp:'案内標識', en:'Guide sign', tr:'Yönlendirme işareti (yeşil tabelalar — otoyol, şehir yönleri)', r:'あんないひょうしき', k:'あ'},
+  {jp:'インターチェンジ', en:'Interchange / On-Off ramp', tr:'Otoyol giriş/çıkış kavşağı', r:'', k:'あ'},
+  {jp:'ETC', en:'ETC — Electronic Toll Collection', tr:'Elektronik geçiş sistemi (otoyol gişesi)', r:'', k:'あ'},
+  {jp:'遠心力', en:'Centrifugal force', tr:'Merkezkaç kuvveti — virajda dışa iter, hız ve dönüş keskinliği arttıkça büyür', r:'えんしんりょく', k:'あ'},
+  {jp:'追い越し', en:'Overtaking', tr:'One gecmek icin serit degistirmek (追い抜き - ovinmekten farkli)', r:'おいこし', k:'あ'},
+  {jp:'追い抜き', en:'Passing', tr:'Şerit değiştirmeden yanından geçmek (overtaking değil)', r:'おいぬき', k:'あ'},
+  {jp:'横断歩道', en:'Pedestrian crossing / Crosswalk', tr:'Yaya geçidi — yaklaşırken yavaşlamalısın, yaya varsa dur', r:'おうだんほどう', k:'あ'},
+  {jp:'大型自動車', en:'Large vehicle', tr:'Ağır vasıta: büyük kamyon, otobüs vs.', r:'おおがたじどうしゃ', k:'あ'},
+  {jp:'大型自動二輪車', en:'Large motorcycle', tr:'Büyük motosiklet: 400cc üzeri', r:'おおがたじどうにりんしゃ', k:'あ'},
+  {jp:'大型特殊自動車', en:'Large special vehicle', tr:'Büyük özel araç: iş makinesi, ekskavatör vs.', r:'おおがたとくしゅじどうしゃ', k:'あ'},
+  {jp:'仮運転免許', en:'Provisional driving license', tr:'Geçici ehliyet: okul dışında kamuryolunda pratik için', r:'かりうんてんめんきょ', k:'か'},
+  {jp:'仮免許練習標識', en:"Learner's permit practice sign", tr:'Geçici ehliyet pratik işareti: araçta ön ve arkaya takılmalı', r:'かりめんきょれんしゅうひょうしき', k:'か'},
+  {jp:'規制速度', en:'Regulated speed limit', tr:'İşaretle belirlenmiş hız limiti (vs. 法定速度 yasal limit)', r:'きせいそくど', k:'か'},
+  {jp:'規制標識', en:'Regulatory sign', tr:'Düzenleyici işaret: kırmızı çerçeveli (yasak/kısıtlama)', r:'きせいひょうしき', k:'か'},
+  {jp:'規制標示', en:'Regulatory road marking', tr:'Yol üzerindeki düzenleyici çizgi veya yazı', r:'きせいひょうじ', k:'か'},
+  {jp:'軌道敷内', en:'Tram / railway track area', tr:'Tramvay yolu içi: araç giremez, istisnalar var', r:'きどうしきない', k:'か'},
+  {jp:'強制保険', en:'Compulsory insurance (CALI)', tr:'Zorunlu trafik sigortası: her araçta olmalı, karşı tarafın yaralanmasını karşılar', r:'きょうせいほけん', k:'か'},
+  {jp:'緊急自動車', en:'Emergency vehicle', tr:'Acil araç: ambulans, itfaiye, polis — sireni duyunca yol ver!', r:'きんきゅうじどうしゃ', k:'か'},
+  {jp:'空走距離', en:'Reaction / Free-running distance', tr:'Tepki mesafesi: frene basmadan önce gidilen mesafe', r:'くうそうきょり', k:'か'},
+  {jp:'クラッチ・スタートシステム', en:'Clutch start system', tr:'Güvenlik: debriyaja basmadan araç çalışmaz', r:'', k:'か'},
+  {jp:'クリープ現象', en:'Creep phenomenon', tr:'AT araçta gaz vermeden yavaşça ilerler: dikkat!', r:'クリープげんしょう', k:'か'},
+  {jp:'車', en:'Vehicle', tr:'Araç (genel)', r:'くるま', k:'か'},
+  {jp:'警音器', en:'Horn', tr:'Korna: gereksiz kullanım yasak, ancak işaret olan yerlerde veya tehlikede çal', r:'けいおんき', k:'か'},
+  {jp:'警戒標識', en:'Warning sign', tr:'Uyarı işareti: sarı/kırmızı üçgen — tehlikeli bölge', r:'けいかいひょうしき', k:'か'},
+  {jp:'警察官など', en:'Police officer / Traffic officer', tr:'Polis/trafik memuru — el işareti trafik ışığına GÖRE ÖNCELİKLİ', r:'けいさつかんなど', k:'か'},
+  {jp:'軽車両', en:'Light vehicle', tr:'Hafif araç: bisiklet, at arabası, rikşa vs.', r:'けいしゃりょう', k:'か'},
+  {jp:'けん引自動車', en:'Towing vehicle / Tractor-trailer', tr:'Çekici araç (tır)', r:'けんいんじどうしゃ', k:'か'},
+  {jp:'けん引免許', en:'Towing license', tr:'Çekici araç ehliyeti (tır için ayrı lisans)', r:'けんいんめんきょ', k:'か'},
+  {jp:'検査対象外軽自動車', en:'Inspection-exempt light vehicle', tr:'Muayeneden muaf hafif araç (125cc motosiklet, mini araba)', r:'けんさたいしょうがいけいじどうしゃ', k:'か'},
+  {jp:'検査標章', en:'Vehicle inspection sticker', tr:'Araç muayene etiketi: ön cama yapıştırılır, tarihi gösterir', r:'けんさひょうしょう', k:'か'},
+  {jp:'原動機付自転車', en:'Moped / Motorized bicycle', tr:'Moped: 50cc veya 125cc altı — özel yol kuralları var', r:'げんどうきつきじてんしゃ', k:'か'},
+  {jp:'げん惑', en:'Glare (from headlights)', tr:'Farların gözü kamaştırması — karşı araç geçene kadar bekle', r:'げんわく', k:'か'},
+  {jp:'交差点', en:'Intersection', tr:'Kavşak', r:'こうさてん', k:'か'},
+  {jp:'高速道路', en:'Expressway / Motorway', tr:'Otoyol: özel kurallar, minimum ve maksimum hız var', r:'こうそくどうろ', k:'か'},
+  {jp:'交通巡視員', en:'Traffic patrol officer', tr:'Trafik devriye memuru (polis değil, ama sinyallerine uy)', r:'こうつうじゅんしいん', k:'か'},
+  {jp:'こう配の急な下り坂', en:'Steep downhill slope', tr:'Dik iniş yokuşu: park yasak, motor freni kullan', r:'こうばいのきゅうなくだりざか', k:'か'},
+  {jp:'こう配の急な坂', en:'Steep slope (up or down)', tr:'Dik yokuş: iniş veya çıkış', r:'こうばいのきゅうなさか', k:'か'},
+  {jp:'こう配の急な上り坂', en:'Steep uphill slope', tr:'Dik çıkış yokuşu: çıkarken öncelik sende, inene yol ver', r:'こうばいのきゅうなのぼりざか', k:'か'},
+  {jp:'高齢運転者等専用場所', en:'Elderly driver designated parking', tr:'Yaşlı/engelli sürücü özel park yeri', r:'こうれいうんてんしゃとうせんようばしょ', k:'か'},
+  {jp:'高齢運転者標識', en:'Elderly driver sign', tr:'Yaşlı sürücü işareti (turuncu/sarı yaprak): koruyarak geç', r:'こうれいうんてんしゃひょうしき', k:'か'},
+  {jp:'小型特殊自動車', en:'Small special vehicle', tr:'Küçük özel araç: traktör, forklift vs.', r:'こがたとくしゅじどうしゃ', k:'か'},
+  {jp:'最大積載量', en:'Maximum load capacity', tr:'Maksimum yük kapasitesi: aşarsan yasak ve tehlikeli', r:'さいだいせきさいりょう', k:'さ'},
+  {jp:'死角', en:'Blind spot', tr:'Kör nokta: göremediğin alan — özellikle büyük araçlarda ve direksiyonda', r:'しかく', k:'さ'},
+  {jp:'指示標識', en:'Instruction sign', tr:'Talimat işareti: mavi kare — zorunlu yapılacak şey', r:'しじひょうしき', k:'さ'},
+  {jp:'指示標示', en:'Instruction road marking', tr:'Yol üzerindeki mavi/beyaz talimat çizgisi veya yazısı', r:'しじひょうじ', k:'さ'},
+  {jp:'車道', en:'Roadway / Carriageway', tr:'Taşıt yolu (kaldırım/yaya yolu değil)', r:'しゃどう', k:'さ'},
+  {jp:'車両総重量', en:'Gross vehicle weight (GVW)', tr:'Araç + yük + yolcu toplam ağırlığı', r:'しゃりょうそうじゅうりょう', k:'さ'},
+  {jp:'車両通行帯', en:'Traffic lane', tr:'Trafik şeridi: noktalı çizgilerle ayrılmış her yol', r:'しゃりょうつうこうたい', k:'さ'},
+  {jp:'車両通行帯のある道路', en:'Road with traffic lanes', tr:'Şeritli yol: en sol serbest şeritte git', r:'しゃりょうつうこうたいのあるどうろ', k:'さ'},
+  {jp:'車両通行帯のない道路', en:'Road without traffic lanes', tr:'Şeritsiz yol: soldan kenara yakın git', r:'しゃりょうつうこうたいのないどうろ', k:'さ'},
+  {jp:'集団', en:'Group (cyclists / pedestrians)', tr:'Toplu geçiş grubu: ayrı şerit gerektirmeden geçer', r:'しゅうだん', k:'さ'},
+  {jp:'衝撃力', en:'Impact force', tr:'Çarpma kuvveti = hız² orantılı — 2 kat hız → 4 kat etki!', r:'しょうげきりょく', k:'さ'},
+  {jp:'初心運転者標識', en:'Novice driver sign', tr:'Yeni sürücü işareti (yeşil/sarı yaprak): ehliyet aldıktan 1 yıl boyunca', r:'しょしんうんてんしゃひょうしき', k:'さ'},
+  {jp:'信号機', en:'Traffic signal / Traffic light', tr:'Trafik ışığı', r:'しんごうき', k:'さ'},
+  {jp:'身体障がい者標識', en:'Physically disabled driver sign', tr:'Engelli sürücü işareti: özel ayrıcalıklar var', r:'しんたいしょうがいしゃひょうしき', k:'さ'},
+  {jp:'シートベルト', en:'Seatbelt', tr:'Emniyet kemeri: sürücü ve tüm yolcular takar', r:'', k:'さ'},
+  {jp:'自転車', en:'Bicycle', tr:'Bisiklet (軽車両 kategorisi, kendine ait kuralları var)', r:'じてんしゃ', k:'さ'},
+  {jp:'自転車横断帯', en:'Bicycle crossing', tr:'Bisiklet geçidi: yaya geçidinin yanında, biniciler buradan geçer', r:'じてんしゃおうだんたい', k:'さ'},
+  {jp:'自転車道', en:'Bicycle path', tr:'Bisiklet yolu: arabalar giremez', r:'じてんしゃどう', k:'さ'},
+  {jp:'自動車運転代行業', en:'Designated driver service', tr:'Vekil sürücü hizmeti: içki içince arabayı onlar sürer', r:'じどうしゃうんてんだいこうぎょう', k:'さ'},
+  {jp:'準中型自動車', en:'Semi-medium vehicle', tr:'Yarı-orta araç: 3.5–7.5 ton', r:'じゅんちゅうがたじどうしゃ', k:'さ'},
+  {jp:'乗車定員', en:'Passenger capacity', tr:'Araçta taşınabilecek maksimum kişi sayısı', r:'じょうしゃていいん', k:'さ'},
+  {jp:'蒸発現象', en:'Evaporation phenomenon', tr:'Gece yayaların görünmez olması: iki aracın karşılıklı far ışıkları birbirini karşılar', r:'じょうはつげんしょう', k:'さ'},
+  {jp:'徐行', en:'Slow down (creep forward)', tr:'Yavaşlamak = anında durabilecek hız (yaklaşık 10 km/h altı)', r:'じょこう', k:'さ'},
+  {jp:'すぐに停止できるような速度', en:'Speed allowing immediate stop', tr:'Anında durabilecek hız = 徐行 tanımı', r:'すぐにていしできるようなそくど', k:'さ'},
+  {jp:'静止視力', en:'Static visual acuity', tr:'Durgun nesne görme keskinliği (ehliyet sınavında test edilir)', r:'せいし・しりょく', k:'さ'},
+  {jp:'制動距離', en:'Braking distance', tr:'Frenleme mesafesi: fren tutmaya başlamasından duruncaya kadar gidilen', r:'せいどうきょり', k:'さ'},
+  {jp:'責任共済', en:'Liability mutual aid insurance', tr:'Sorumluluk kooperatif sigortası (JA vs.): zorunlu sigortaya eşdeğer', r:'せきにんきょうさい', k:'さ'},
+  {jp:'専用通行帯', en:'Exclusive lane', tr:'Özel şerit: otobüs, bisiklet, taksi şeridi vs.', r:'せんようつうこうたい', k:'さ'},
+  {jp:'専用場所駐車標章', en:'Dedicated parking permit sticker', tr:'Özel park izni etiketi: engelli veya yaşlı için', r:'せんようばしょちゅうしゃひょうしょう', k:'さ'},
+  {jp:'総排気量', en:'Total engine displacement (cc)', tr:'Motor hacmi (cc): ehliyet kategorisini belirler', r:'そうはいきりょう', k:'さ'},
+  {jp:'第一種運転免許', en:'Type 1 (ordinary) driver\'s license', tr:'Normal ehliyet: kişisel, ticari olmayan kullanım', r:'だいいっしゅうんてんめんきょ', k:'た'},
+  {jp:'代行運転自動車標識', en:'Designated driver vehicle sign', tr:'Vekil sürücü aracı işareti: hizmet sırasında takılır', r:'だいこううんてんじどうしゃひょうしき', k:'た'},
+  {jp:'第二種運転免許', en:'Type 2 (commercial) driver\'s license', tr:'Ticari ehliyet: taksi, otobüs şoförü için', r:'だいにしゅうんてんめんきょ', k:'た'},
+  {jp:'チャイルドシート', en:'Child safety seat', tr:'Çocuk koltuğu: 6 yaş altı için zorunlu', r:'', k:'た'},
+  {jp:'中型自動車', en:'Medium vehicle', tr:'Orta boy araç: 7.5–11 ton arası', r:'ちゅうがたじどうしゃ', k:'た'},
+  {jp:'駐車', en:'Parking', tr:'Park etmek: araçtan ayrılmak VEYA 5 dakikadan uzun durmak', r:'ちゅうしゃ', k:'た'},
+  {jp:'駐停車禁止路側帯', en:'No parking/stopping roadside zone', tr:'Park ve durmak yasak kenar şerit: çift beyaz çizgi', r:'ちゅうていしゃきんしろそくたい', k:'た'},
+  {jp:'聴覚障がい者標識', en:'Hearing impaired driver sign', tr:'İşitme engelli sürücü işareti: özel dikkat gerektir', r:'ちょうかくしょうがいしゃひょうしき', k:'た'},
+  {jp:'定期点検', en:'Periodic inspection', tr:'Periyodik bakım: 3 ay, 6 ay veya 1 yıllık', r:'ていきてんけん', k:'た'},
+  {jp:'停止距離', en:'Stopping distance', tr:'Toplam durma mesafesi = tepki (空走) + frenleme (制動) mesafesi', r:'ていしきょり', k:'た'},
+  {jp:'停止表示器材', en:'Stop display device (warning triangle)', tr:'Dur gösterge: üçgen reflektör veya kırmızı ışıklı cihaz — otoyolda zorunlu', r:'ていしひょうじきざい', k:'た'},
+  {jp:'停車', en:'Stopping (short-term)', tr:'Kısa süreli durmak: 5 dakikadan az, araçta biri var', r:'ていしゃ', k:'た'},
+  {jp:'手信号など', en:'Hand signals (police / officer)', tr:'El işaretleri: polis sinyali trafik ışığından ÖNCELİKLİ', r:'てしんごうなど', k:'た'},
+  {jp:'登坂車線', en:'Climbing lane', tr:'Yokuş çıkış şeridi: yavaş araçlar en sağ şeride geçer', r:'とうはんしゃせん', k:'た'},
+  {jp:'動体視力', en:'Dynamic visual acuity', tr:'Hareketli nesne görme keskinliği: hız arttıkça DÜŞER', r:'どうたいしりょく', k:'た'},
+  {jp:'道路', en:'Road', tr:'Yol (genel)', r:'どうろ', k:'た'},
+  {jp:'内輪差', en:'Inner wheel difference / Tail swing', tr:'İç tekerlek farkı: büyük araç dönerken arka iç tekerlek daha dar döner — dikkat!', r:'ないりんさ', k:'な'},
+  {jp:'二段階右折', en:'Two-stage right turn', tr:'2 aşamalı sağa dönüş: moped ve 3+ şeritli yollarda yapılır', r:'にだんかいうせつ', k:'な'},
+  {jp:'日常点検', en:'Daily inspection', tr:'Günlük araç kontrolü: sürüşten önce yapılmalı', r:'にちじょうてんけん', k:'な'},
+  {jp:'二輪車', en:'Two-wheeled vehicle', tr:'İki tekerlekli araç: motosiklet, moped, bisiklet', r:'にりんしゃ', k:'な'},
+  {jp:'任意保険', en:'Voluntary insurance', tr:'İhtiyari sigorta: zorunlu değil ama kesinlikle önerilir', r:'にんいほけん', k:'な'},
+  {jp:'ハイドロプレーニング現象', en:'Hydroplaning', tr:'Islak yolda lastik su üzerinde kayar — kontrol kaybı: HIZI DÜŞÜR', r:'ハイドロプレーニングげんしょう', k:'は'},
+  {jp:'非常信号用具', en:'Emergency signal device', tr:'Acil sinyal aleti: el feneri, parlayan çubuk vs.', r:'ひじょうしんごうようぐ', k:'は'},
+  {jp:'非常点滅表示灯', en:'Hazard lights / Hazard flashers', tr:'Dörtlü flaşör: arıza, tehlike, acil durumda kullan', r:'ひじょうてんめつひょうじとう', k:'は'},
+  {jp:'標識', en:'Road sign', tr:'Yol işareti: direk üzerindeki levha (4 ana tür)', r:'ひょうしき', k:'は'},
+  {jp:'標示', en:'Road marking', tr:'Yol işaretlemesi: yol yüzeyindeki çizgi ve yazılar', r:'ひょうじ', k:'は'},
+  {jp:'普通自動車', en:'Ordinary vehicle', tr:'Normal araç: sıradan otomobil', r:'ふつうじどうしゃ', k:'は'},
+  {jp:'普通自動二輪車', en:'Ordinary motorcycle', tr:'Normal motosiklet: 125cc – 400cc', r:'ふつうじどうにりんしゃ', k:'は'},
+  {jp:'法定速度', en:'Legal (statutory) speed limit', tr:'Yasal hız limiti: işaret yoksa — genel yol 60, otoyol 100 km/h', r:'ほうていそくど', k:'は'},
+  {jp:'歩行者', en:'Pedestrian', tr:'Yaya', r:'ほこうしゃ', k:'は'},
+  {jp:'歩行者用道路', en:'Pedestrian road', tr:'Yaya yolu: araçlar giremez (özel izin hariç)', r:'ほこうしゃようどうろ', k:'は'},
+  {jp:'歩行者用路側帯', en:'Pedestrian roadside zone', tr:'Yaya kenar şeridi: tek beyaz çizgi — araç giremez', r:'ほこうしゃようろそくたい', k:'は'},
+  {jp:'補助標識', en:'Supplementary sign', tr:'Ana işaretin altındaki küçük ek işaret (saat, mesafe vs.)', r:'ほじょひょうしき', k:'は'},
+  {jp:'歩道', en:'Sidewalk / Pavement', tr:'Kaldırım: araçlar giremez', r:'ほどう', k:'は'},
+  {jp:'本線車道', en:'Main roadway (expressway main lane)', tr:'Otoyolun ana şeridi: on/off ramp ile bağlantı', r:'ほんせんしゃどう', k:'は'},
+  {jp:'本標識', en:'Main road sign', tr:'Ana yol işareti: 4 tür → 規制/指示/警戒/案内', r:'ほんひょうしき', k:'は'},
+  {jp:'摩擦力', en:'Friction force', tr:'Sürtünme kuvveti: ıslak/buzlu yolda düşer → durma mesafesi uzar', r:'まさつりょく', k:'ま'},
+  {jp:'ミニカー', en:'Minicar', tr:'Mini araba: 50cc 4 tekerlekli (mopede benzer ama 4 teker)', r:'', k:'ま'},
+  {jp:'明順応', en:'Light adaptation', tr:'Aydınlığa gözün alışması: tünelden çıkarken geçici körlük', r:'めいじゅんのう', k:'ま'},
+  {jp:'夜間', en:'Nighttime', tr:'Gece: güneş batımından güneş doğumuna kadar', r:'やかん', k:'や'},
+  {jp:'優先道路', en:'Priority road', tr:'Öncelikli yol: diğer yoldan gelen sana yol vermek zorunda', r:'ゆうせんどうろ', k:'や'},
+  {jp:'幼児', en:'Young child / Infant', tr:'Küçük çocuk: チャイルドシート gerektiren yaş grubu', r:'ようじ', k:'や'},
+  {jp:'路肩', en:'Road shoulder / Hard shoulder', tr:'Yol omzu/banket: acil durum dışında girilmez', r:'ろかた', k:'ら'},
+  {jp:'路線バスなど', en:'Route bus etc.', tr:'Hat otobüsü: yoldan çıkacaksa arkasında beklemelisin', r:'ろせんバスなど', k:'ら'},
+  {jp:'路側帯', en:'Roadside zone', tr:'Kenar şerit: kaldırımsız yolda yaya yürür, araçlar az girebilir', r:'ろそくたい', k:'ら'},
+  {jp:'路面電車', en:'Tram / Streetcar', tr:'Tramvay: rayları paylaşırken özel geçiş kuralları var', r:'ろめんでんしゃ', k:'ら'},
+];
+
+// ===== CARD STATE =====
+let activeCards = [...VOCAB];
+let cardIdx = 0;
+
+// ===== TAB SYSTEM =====
+function showTab(name, btn) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ===== SECTION SYSTEM =====
+function showSection(num, btn) {
+  document.querySelectorAll('.lesson-group').forEach(g => g.classList.remove('active'));
+  document.querySelectorAll('.sec-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('section' + num).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ===== BUILD LESSON LISTS =====
+
+function showQSection(num, btn) {
+  document.querySelectorAll('#tab-sorular .q-group').forEach(g => g.style.display = 'none');
+  document.getElementById('qsection' + num).style.display = 'block';
+  document.querySelectorAll('#tab-sorular .sec-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+}
+
+const QUIZ = {
+  11: [
+    {jp:'Ａ車は、前車を追い越すときは中央線をはみ出すことができる。',
+     en:'Car A can cross the center line when overtaking the car ahead.', ans:true},
+    {jp:'追い抜きとは、車が進路を変えて進行中の前車の前方に出ることをいう。',
+     en:'Passing (追い抜き) means changing your lane to get in front — TRUE or FALSE?', ans:false},
+    {jp:'中央線をはみ出して追い越そうとする場合、前車や対向車の通行を妨げるおそれがあるときは、追い越しをしてはならない。',
+     en:'If crossing the center line to overtake would obstruct other traffic, you must not overtake.', ans:true},
+    {jp:'横断歩道や自転車横断帯とその前後３０メートル以内の場所は、追い越しが禁止されている。',
+     en:'Overtaking is prohibited within 30m before and after pedestrian/bicycle crossings.', ans:true},
+    {jp:'Ａ車は、前車を追い越すときは中央線をはみ出すことができる。',
+     en:'Car A can cross the center line when overtaking the car ahead. (2nd question)', ans:true},
+    {jp:'追い越した車の前に入るときは、追い越した車との間に安全な車間距離をとらなくてはならない。',
+     en:'After overtaking, must maintain a safe following distance before cutting back in.', ans:true},
+    {jp:'前車が右折の合図をしていても、その右側から追い越してよい。',
+     en:'Even if the car ahead signals a right turn, you may still overtake from the right.', ans:false},
+    {jp:'軌道が道路の中央に設けられているところで路面電車を追い越すときは、その左側を通行しなければならない。',
+     en:'When overtaking a tram on center tracks, you must pass on its LEFT side.', ans:true},
+    {jp:'追い越した車の前に入るときは、追い越した車との間に安全な車間距離をとらなくてはならない。',
+     en:'After overtaking, must maintain a safe following distance. (2nd question)', ans:true},
+    {jp:'一般道路で前車を追い越し左に進路を変えるときは、追い越した車がルームミラーで見える距離になるまで、そのまま進んで進路を変えるようにする。',
+     en:'After overtaking, move back left only when the overtaken car appears in your rearview mirror.', ans:true},
+    {jp:'走行中に後続車から追い越されるときは、速度を下げなければならない。',
+     en:'When being overtaken by a vehicle behind, you MUST reduce your speed.', ans:false},
+    {jp:'走行中に後続車から追い越されるときは、速度を下げなければならない。',
+     en:'When being overtaken by a vehicle behind, you MUST reduce speed. (2nd question)', ans:false},
+    {jp:'歩行者や自転車と行き違うときは、安全な間隔を保って通行しなければならないが、対向車と行き違うときはその必要はない。',
+     en:'Must keep safe intervals with pedestrians/cyclists, but not with oncoming cars.', ans:false},
+    {jp:'歩行者や自転車と行き違うときは、安全な間隔を保って通行しなければならないが、対向車と行き違うときはその必要はない。',
+     en:'Must keep safe intervals with pedestrians/cyclists, but not with oncoming cars. (2nd question)', ans:false},
+    {jp:'障害物があるときは、障害物のある側の車が一時停止や速度を落として対向車に道を譲らなければならない。',
+     en:'When there is an obstacle on one side, the vehicle on that side must stop/slow down to yield.', ans:true},
+  ],
+  12: [
+    {jp:'運転免許の停止処分中に車を運転すると、無免許運転になる。',
+     en:'Driving during a license suspension counts as driving without a license (無免許運転).', ans:true},
+    {jp:'免許証等は大切なものだから、自動車や一般原動機付自転車を運転するときも紛失しないように自宅に保管しておく。',
+     en:'Since the license is precious, keep it at home (not in the car) to avoid losing it while driving.', ans:false},
+    {jp:'普通免許を受けていれば、最大積載量２トンのトラックを運転することができる。',
+     en:'With an ordinary license you can drive a truck with a maximum load of 2 tons.', ans:false},
+    {jp:'故障車をロープやクレーンでけん引するときは、けん引免許が必要である。',
+     en:'Towing a broken-down vehicle with a rope or crane requires a towing license.', ans:false},
+    {jp:'仮免許を受けた者が路上練習するときは、その車の前と後ろの定められた位置に「仮免許練習標識」を付けなければならない。',
+     en:'Provisional license holders practicing on public roads must attach provisional signs at front AND rear.', ans:true},
+  ],
+  13: [
+    {jp:'オートマチック車で駐車するときは、チェンジレバーをローの位置にしておかなければならない。',
+     en:'When parking an AT vehicle, the gear lever must be set to LOW (L) position.', ans:false},
+    {jp:'オートマチック車は、チェンジレバーが「Ｐ」（パーキング）または「Ｎ」（ニュートラル）の位置にないときは、エンジンが始動しない構造になっており、「Ｐ」の位置で始動するのが基本である。',
+     en:'AT vehicles only start in P or N; starting in P (Park) is standard.', ans:true},
+    {jp:'四輪車のドライバーは、二輪車までの距離は実際より近く、速度は実際より速く感じやすい。',
+     en:'Car drivers tend to judge motorcycles as CLOSER and FASTER than they actually are.', ans:false},
+    {jp:'四輪車から二輪車を見た場合、二輪車までの距離は実際より近く、二輪車の速度は実際より速く感じやすい。',
+     en:'When car drivers view motorcycles, they tend to feel the distance is CLOSER and speed FASTER than reality.', ans:false},
+    {jp:'運転中は、ルームミラーやサイドミラーを見ることは前方への注意が散漫になるので、なるべく見ないようにする。',
+     en:'While driving, limit checking mirrors because it reduces attention to the road ahead.', ans:false},
+    {jp:'幼児は身長が低いために、駐停車車両が乗用車であっても死角に入りやすいので、駐停車車両の側方を通過する場合には、十分注意する。',
+     en:'Young children can hide in blind spots even behind passenger cars — extra caution when passing parked vehicles.', ans:true},
+    {jp:'運転中は、ルームミラーやサイドミラーを見ることは前方への注意が散漫になるので、なるべく見ないようにする。',
+     en:'While driving, limit checking mirrors because it reduces attention ahead. (2nd question)', ans:false},
+    {jp:'交差点などでパッシングする場合、その意味は使用状況によって異なることがある。',
+     en:'Headlight flashing (passing) at intersections can mean different things depending on the situation.', ans:true},
+    {jp:'右折待ちのとき、対向車がパッシングしてきたら「先に行ってください」という意味だから、すぐに右折してよい。',
+     en:'When waiting to turn right, if an oncoming car flashes headlights (meaning "go ahead"), you should turn immediately.', ans:false},
+  ]
+};
+
+const quizScores = {11:{c:0,t:0}, 12:{c:0,t:0}, 13:{c:0,t:0}};
+const answeredQ = {};
+
+function buildQuiz() {
+  [11,12,13].forEach(sec => {
+    const div = document.getElementById('qsection' + sec);
+    if (!div) return;
+    const qs = QUIZ[sec];
+    div.innerHTML =
+      '<div class="quiz-score-bar">' +
+        '<span>Toplam Skor: <span class="quiz-score-val" id="qscore'+sec+'">0 / 0</span></span>' +
+        '<button class="quiz-reset-btn" onclick="resetQuiz('+sec+')">↺ Sıfırla</button>' +
+      '</div>' +
+      qs.map((q, i) =>
+        '<div class="quiz-card" id="qc_'+sec+'_'+i+'">' +
+          '<div class="quiz-num">Soru ' + (i+1) + '</div>' +
+          '<div class="quiz-jp">' + q.jp + '</div>' +
+          '<div class="quiz-hint">' + q.en + '</div>' +
+          '<div class="quiz-btns">' +
+            '<button class="qbtn qbtn-maru" onclick="answerQ('+sec+','+i+',true)">○</button>' +
+            '<button class="qbtn qbtn-batu" onclick="answerQ('+sec+','+i+',false)">×</button>' +
+          '</div>' +
+          '<div class="quiz-feedback" id="qf_'+sec+'_'+i+'"></div>' +
+        '</div>'
+      ).join('');
+  });
+}
+
+function answerQ(sec, idx, userAns) {
+  const key = sec + '_' + idx;
+  if (answeredQ[key]) return;
+  answeredQ[key] = true;
+  const q = QUIZ[sec][idx];
+  const correct = (userAns === q.ans);
+  quizScores[sec].t++;
+  if (correct) quizScores[sec].c++;
+  const card = document.getElementById('qc_' + sec + '_' + idx);
+  const fb = document.getElementById('qf_' + sec + '_' + idx);
+  card.classList.add(correct ? 'quiz-correct' : 'quiz-wrong');
+  fb.innerHTML = correct
+    ? '<span class="qfb-ok">✓ 正解！　正解: ' + (q.ans ? '○' : '×') + '</span>'
+    : '<span class="qfb-ng">✗ 不正解。　正解: ' + (q.ans ? '○' : '×') + '</span>';
+  card.querySelectorAll('.qbtn').forEach(b => b.disabled = true);
+  document.getElementById('qscore' + sec).textContent =
+    quizScores[sec].c + ' / ' + quizScores[sec].t;
+}
+
+function resetQuiz(sec) {
+  QUIZ[sec].forEach((q, i) => { delete answeredQ[sec + '_' + i]; });
+  quizScores[sec] = {c:0, t:0};
+  buildQuiz();
+  showQSection(sec, null);
+}
+
+function buildLessons() {
+  [11, 12, 13].forEach(sec => {
+    const container = document.getElementById('section' + sec);
+    LESSONS[sec].forEach(l => {
+      const div = document.createElement('div');
+      div.className = 'lesson-item';
+      div.innerHTML =
+        '<span class="lesson-num">#' + l.id + '</span>' +
+        '<span class="lesson-jp">' + l.jp + '<br><span class="lesson-en">' + l.en + '</span></span>';
+      div.style.cursor = 'default';
+      container.appendChild(div);
+    });
+  });
+}
+
+// ===== VOCAB TABLE =====
+let tableFilter = 'all';
+
+function buildVocabTable(data) {
+  const tbody = document.getElementById('vocab-tbody');
+  tbody.innerHTML = '';
+  data.forEach(v => {
+    const tr = document.createElement('tr');
+    const jpCell = v.r ? '<td class="td-jp">' + v.jp + '<br><span class="td-reading">' + v.r + '</span></td>' : '<td class="td-jp">' + v.jp + '</td>';
+    tr.innerHTML = jpCell + '<td class="td-en">' + v.en + '</td><td class="td-tr">' + v.tr + '</td>';
+    tbody.appendChild(tr);
+  });
+}
+
+function filterVocabTable() {
+  const q = document.getElementById('vocab-search').value.toLowerCase();
+  let data = tableFilter === 'all' ? VOCAB : VOCAB.filter(v => v.k === tableFilter);
+  if (q) data = data.filter(v => v.jp.toLowerCase().includes(q) || v.en.toLowerCase().includes(q) || v.tr.toLowerCase().includes(q));
+  buildVocabTable(data);
+}
+
+function filterTableAlpha(group, btn) {
+  document.querySelectorAll('#table-alpha-filter button').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  tableFilter = group;
+  document.getElementById('vocab-search').value = '';
+  buildVocabTable(group === 'all' ? VOCAB : VOCAB.filter(v => v.k === group));
+}
+
+// ===== FLASHCARD =====
+function updateCard() {
+  if (activeCards.length === 0) return;
+  const v = activeCards[cardIdx];
+  document.getElementById('card-jp').textContent = v.jp;
+  // Okuma (furigana)
+  let rdEl = document.getElementById('card-reading');
+  if (!rdEl) { rdEl = document.createElement('div'); rdEl.id='card-reading'; rdEl.className='card-reading'; document.getElementById('card-jp').after(rdEl); }
+  rdEl.textContent = v.r || '';
+  document.getElementById('card-en').textContent = v.en;
+  document.getElementById('card-tr').textContent = v.tr;
+  document.getElementById('card-progress').textContent = (cardIdx + 1) + ' / ' + activeCards.length;
+  const fc = document.getElementById('flashcard');
+  fc.classList.remove('flipped');
+}
+
+function flipCard() {
+  document.getElementById('flashcard').classList.toggle('flipped');
+}
+
+function nextCard() { cardIdx = (cardIdx + 1) % activeCards.length; updateCard(); }
+function prevCard() { cardIdx = (cardIdx - 1 + activeCards.length) % activeCards.length; updateCard(); }
+
+function shuffleCards() {
+  for (let i = activeCards.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [activeCards[i], activeCards[j]] = [activeCards[j], activeCards[i]];
+  }
+  cardIdx = 0;
+  updateCard();
+}
+
+function filterCardAlpha(group, btn) {
+  document.querySelectorAll('#card-alpha-filter button').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  activeCards = group === 'all' ? [...VOCAB] : VOCAB.filter(v => v.k === group);
+  cardIdx = 0;
+  updateCard();
+}
+
+// ===== VOCAB MODE TOGGLE =====
+function setVocabMode(mode, btn) {
+  document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('vocab-card-view').classList.remove('active');
+  document.getElementById('vocab-table-view').classList.remove('active');
+  document.getElementById('vocab-' + mode + '-view').classList.add('active');
+}
+
+// ===== KEYBOARD SHORTCUTS =====
+document.addEventListener('keydown', function(e) {
+  if (document.getElementById('tab-kelimeler').classList.contains('active') &&
+      document.getElementById('vocab-card-view').classList.contains('active')) {
+    if (e.key === 'ArrowRight') nextCard();
+    else if (e.key === 'ArrowLeft') prevCard();
+    else if (e.key === ' ') { e.preventDefault(); flipCard(); }
+  }
+});
+
+
+// ===== SIGNS DATA =====
+const SIGNS = [
+  // ── 規制標識 (Regulatory Signs) ──
+  {n:1,  cat:'reg', jp:'通行止め',         kana:'つうこうどめ',            en:'Road Closed',                                   tr:'Trafik kapalı — her türlü araç ve yayaya geçiş yasaktır.'},
+  {n:2,  cat:'reg', jp:'車両通行止め',      kana:'しゃりょうつうこうどめ',  en:'Closed to All Vehicles',                        tr:'Tüm araçlara yasak — yayalar geçebilir.'},
+  {n:3,  cat:'reg', jp:'車両進入禁止',      kana:'しゃりょうしんにゅうきんし', en:'No Entry for Vehicles',                      tr:'Araç girişi yasak — tek yönlü yolun ters girişine konulur.'},
+  {n:4,  cat:'reg', jp:'二輪の自動車以外の自動車通行止め', kana:'にりんのじどうしゃいがいのじどうしゃつうこうどめ', en:'Closed to All Vehicles except Motorcycles', tr:'Motosiklet dışındaki tüm araçlara yasak.'},
+  {n:5,  cat:'reg', jp:'大型貨物自動車等通行止め', kana:'おおがたかもつじどうしゃとうつうこうどめ', en:'Closed to Large-Size Trucks',                tr:'Büyük yük araçlarına geçiş yasaktır.'},
+  {n:6,  cat:'reg', jp:'特定の最大積載量以上の貨物自動車等通行止め', kana:'とくていのさいだいせきさいりょういじょうのかもつじどうしゃとうつうこうどめ', en:'Closed to Trucks Exceeding Max Load on Sign', tr:'Levhada belirtilen yükü aşan kamyonlara yasak.'},
+  {n:7,  cat:'reg', jp:'大型乗用自動車等通行止め', kana:'おおがたじょうようじどうしゃとうつうこうどめ', en:'Closed to Large-Size Passenger Vehicles',    tr:'Büyük yolcu taşıtlarına (otobüs vb.) geçiş yasaktır.'},
+  {n:8,  cat:'reg', jp:'自動二輪車及び原動機付自転車通行止め', kana:'じどうにりんしゃおよびげんどうきつきじてんしゃつうこうどめ', en:'Closed to Motorcycles and Mopeds',          tr:'Motosikletler ve motorlu bisikletlere yasak.'},
+  {n:9,  cat:'reg', jp:'軽車両通行止め（自転車以外）', kana:'けいしゃりょうつうこうどめ', en:'Closed to Light Vehicles except Bicycles',    tr:'Bisiklet dışındaki hafif araçlara yasak.'},
+  {n:10, cat:'reg', jp:'自転車通行止め',     kana:'じてんしゃつうこうどめ',   en:'Closed to Bicycles',                            tr:'Bisikletlere geçiş yasaktır.'},
+  {n:11, cat:'reg', jp:'危険物積載車両通行止め', kana:'きけんぶつせきさいしゃりょうつうこうどめ', en:'Closed to Vehicles Shown',                  tr:'Levhada gösterilen araç türlerine yasak.'},
+  {n:12, cat:'reg', jp:'指定方向外進行禁止',  kana:'していほうこうがいしんこうきんし', en:'Proceed Only to Designated Directions',        tr:'Yalnızca levhada gösterilen yönde gidilebilir.'},
+  {n:13, cat:'reg', jp:'車両横断禁止',       kana:'しゃりょうおうだんきんし',  en:'No Vehicles Crossing',                          tr:'Araçların yolu çapraz geçmesi yasaktır (sol çıkış hariç).'},
+  {n:14, cat:'reg', jp:'転回禁止',           kana:'てんかいきんし',           en:'No U-turn',                                     tr:'U dönüşü yasaktır.'},
+  {n:15, cat:'reg', jp:'追越しのための右側部分はみ出し通行禁止', kana:'おいこしのためのみぎがわぶぶんはみだしつうこうきんし', en:'No Passing on Right-hand Portion for Overtaking', tr:'Sollama için karşı şeride geçmek yasaktır.'},
+  {n:16, cat:'reg', jp:'追い越し禁止',       kana:'おいこしきんし',           en:'No Overtaking',                                 tr:'Her türlü sollama yasaktır.'},
+  {n:17, cat:'reg', jp:'駐停車禁止',         kana:'ちゅうていしゃきんし',     en:'No Parking or Stopping',                        tr:'Park etmek ve durmak tamamen yasaktır.'},
+  {n:18, cat:'reg', jp:'駐車禁止',           kana:'ちゅうしゃきんし',         en:'No Parking',                                    tr:'Park etmek yasaktır (kısa duruş yapılabilir).'},
+  {n:19, cat:'reg', jp:'駐車余地',           kana:'ちゅうしゃよち',           en:'Parking Space Designated',                      tr:'Belirlenmiş park alanı. Çıkış için park boşluğu bırakılmalıdır.'},
+  {n:20, cat:'reg', jp:'時間制限駐車区間',   kana:'じかんせいげんちゅうしゃくかん', en:'Time-limited Parking Zone',                tr:'Levhada belirtilen süre kadar park yapılabilir.'},
+  {n:21, cat:'reg', jp:'危険物積載車両通行止め', kana:'きけんぶつせきさいしゃりょうつうこうどめ', en:'Dangerous Substances Prohibited',          tr:'Patlayıcı/tehlikeli madde taşıyan araçlara yasak.'},
+  {n:22, cat:'reg', jp:'重量制限',           kana:'じゅうりょうせいげん',     en:'Maximum Weight Limit',                          tr:'Belirtilen tonajı aşan araçlar giremez.'},
+  {n:23, cat:'reg', jp:'高さ制限',           kana:'たかさせいげん',           en:'Maximum Height Limit',                          tr:'Belirtilen yüksekliği aşan araçlar giremez.'},
+  {n:24, cat:'reg', jp:'幅員制限',           kana:'ふくいんせいげん',         en:'Maximum Width Limit',                           tr:'Belirtilen genişliği aşan araçlar giremez.'},
+  {n:25, cat:'reg', jp:'最高速度',           kana:'さいこうそくど',           en:'Maximum Speed Limit',                           tr:'Azami hiz levhada belirtilen km/s sinirini gecemez.'},
+  {n:26, cat:'reg', jp:'特定の種類の車両の最高速度', kana:'とくていのしゅるいのしゃりょうのさいこうそくど', en:'Max Speed Limit for Specific Vehicle Types', tr:'Belirtilen araç türleri için özel azami hız sınırı.'},
+  {n:27, cat:'reg', jp:'最低速度',           kana:'さいていそくど',           en:'Minimum Speed Limit',                           tr:'Asgari hız — bu hızın altına düşülemez (genellikle otoyol).'},
+  {n:28, cat:'reg', jp:'自動車専用',         kana:'じどうしゃせんよう',       en:'Motor Vehicles Only',                           tr:'Yalnızca motorlu araçlar kullanabilir (otoyol/ekspresyol).'},
+  {n:29, cat:'reg', jp:'自転車専用',         kana:'じてんしゃせんよう',       en:'Bicycles Only',                                 tr:'Yalnızca bisikletler kullanabilir.'},
+  {n:30, cat:'reg', jp:'自転車及び歩行者専用', kana:'じてんしゃおよびほこうしゃせんよう', en:'Bicycles And Pedestrians Only',            tr:'Yalnızca bisiklet ve yayalar kullanabilir.'},
+  {n:31, cat:'reg', jp:'歩行者専用',         kana:'ほこうしゃせんよう',       en:'Pedestrians Only',                              tr:'Yalnızca yayalar için ayrılmış yol.'},
+  {n:32, cat:'reg', jp:'一方通行',           kana:'いっぽうつうこう',         en:'One Way',                                       tr:'Tek yönlü yol — ok yönünde ilerlenebilir.'},
+  {n:33, cat:'reg', jp:'車両通行区分',       kana:'しゃりょうつうこうくぶん', en:'Lane Designation',                              tr:'Araç türüne göre şerit kullanımını belirler.'},
+  {n:34, cat:'reg', jp:'特定の種類の車両の通行区分', kana:'とくていのしゅるいのしゃりょうのつうこうくぶん', en:'Lane for Specific Vehicle Types',          tr:'Belirtilen araç türleri için özel şerit.'},
+  {n:35, cat:'reg', jp:'けん引自動車の高速自動車国道通行区分', kana:'けんいんじどうしゃのこうそくじどうしゃこくどうつうこうくぶん', en:'Lane for Tow Trucks on Expressway', tr:'Otoyolda çekici araçların kullanacağı şerit.'},
+  {n:36, cat:'reg', jp:'専用通行帯',         kana:'せんようつうこうたい',     en:'Exclusive Lane',                                tr:'Belirtilen araç türüne özel şerit (diğerleri giremez).'},
+  {n:37, cat:'reg', jp:'路線バス等優先通行帯', kana:'ろせんバスとうゆうせんつうこうたい', en:'Priority Lane for Route Bus',              tr:'Toplu taşıma araçlarına öncelikli şerit.'},
+  {n:38, cat:'reg', jp:'けん引自動車の自動車専用道路第一通行帯通行指定区間', kana:'けんいんじどうしゃのじどうしゃせんようどうろだいいちつうこうたいつうこうしていくかん', en:'Designated Lane for Tow Trucks on Motorway', tr:'Motorlu yolda çekici araçların 1. şeridi kullanması gereken bölge.'},
+  {n:39, cat:'reg', jp:'進行方向別通行区分',  kana:'しんこうほうこうべつつうこうくぶん', en:'Lane Direction Designation',               tr:'Her şeridin gidebileceği yönü gösterir (kavşak öncesi).'},
+  {n:40, cat:'reg', jp:'原動機付自転車の右折方法（二段階）', kana:'げんどうきつきじてんしゃのうせつほうほう', en:'Two-Step Right Turn for Mopeds',           tr:'Mopedler sağa dönüşü iki adımda yapmalıdır.'},
+  {n:41, cat:'reg', jp:'原動機付自転車の右折方法（小回り）', kana:'げんどうきつきじてんしゃのうせつほうほうこまわり', en:'Small Right Turn for Mopeds',              tr:'Mopedler normal araç gibi küçük sağa dönüş yapabilir.'},
+  {n:42, cat:'reg', jp:'警音器使用',         kana:'けいおんきしよう',         en:'Sound Horn',                                    tr:'Bu levhada korna çalınması zorunludur.'},
+  {n:43, cat:'reg', jp:'警音器鳴らせ区間',   kana:'けいおんきならせくかん',   en:'Sounding Zone',                                 tr:'Bu bölgede araçların korna çalması gerekir.'},
+  {n:44, cat:'reg', jp:'徐行',               kana:'じょこう',                 en:'Slow Down',                                     tr:'Yavaşla — hemen durabilecek hızda sür.'},
+  {n:45, cat:'reg', jp:'前方優先道路',       kana:'ぜんぽうゆうせんどうろ',   en:'Give Way',                                      tr:'İlerideki yol önceliklidir — geçmeden önce ver.'},
+  {n:46, cat:'reg', jp:'止まれ',             kana:'とまれ',                   en:'Stop',                                          tr:'Dur — tamamen durulup güvenlik kontrolü yapılmalıdır.'},
+  {n:47, cat:'reg', jp:'一時停止・前方優先', kana:'いちじていし・ぜんぽうゆうせん', en:'Stop / Give Way',                             tr:'Dur ve ilerideki yola öncelik ver.'},
+  {n:48, cat:'reg', jp:'歩行者通行止め',     kana:'ほこうしゃつうこうどめ',   en:'Closed to Pedestrians',                         tr:'Yayalara geçiş yasaktır.'},
+  {n:49, cat:'reg', jp:'歩行者横断禁止',     kana:'ほこうしゃおうだんきんし', en:'Crossing by Pedestrians Prohibited',            tr:'Yayaların yolu çapraz geçmesi yasaktır.'},
+  // ── 指示標識 (Designation Signs) ──
+  {n:50, cat:'des', jp:'並進可',             kana:'へいしんか',               en:'Abreast Riding Permitted',                      tr:'Bisikletlerin yan yana sürüşüne izin verilir.'},
+  {n:51, cat:'des', jp:'軌道敷内通行可',     kana:'きどうしきないつうこうか',  en:'Driving on Tracks Permitted',                   tr:'Tramvay rayları üzerinde araç geçişine izin verilir.'},
+  {n:52, cat:'des', jp:'駐車可',             kana:'ちゅうしゃか',             en:'Parking Permitted',                             tr:'Park etmek serbesttir.'},
+  {n:53, cat:'des', jp:'停車可',             kana:'ていしゃか',               en:'Stopping Permitted',                            tr:'Durmak serbesttir.'},
+  {n:54, cat:'des', jp:'優先道路',           kana:'ゆうせんどうろ',           en:'Right of Way',                                  tr:'Bu yol önceliklidir — diğer yollar size yol vermek zorundadır.'},
+  {n:55, cat:'des', jp:'中央線',             kana:'ちゅうおうせん',           en:'Center Line',                                   tr:'Merkez çizgisi — yolun ortasını gösterir.'},
+  {n:56, cat:'des', jp:'停止線',             kana:'ていしせん',               en:'Stop Line',                                     tr:'Dur çizgisi — bu çizginin önünde durulur.'},
+  {n:57, cat:'des', jp:'横断歩道',           kana:'おうだんほどう',           en:'Pedestrian Crossing',                           tr:'Yaya geçidi — yayalara öncelik verilir.'},
+  {n:58, cat:'des', jp:'自転車横断帯',       kana:'じてんしゃおうだんたい',   en:'Bicycle Crossing Zone',                         tr:'Bisiklet geçit bölgesi.'},
+  {n:59, cat:'des', jp:'横断歩道・自転車横断帯', kana:'おうだんほどう・じてんしゃおうだんたい', en:'Pedestrian and Bicycle Crossing Zone', tr:'Hem yaya hem bisiklet geçit bölgesi.'},
+  {n:60, cat:'des', jp:'安全地帯',           kana:'あんぜんちたい',           en:'Safety Zone',                                   tr:'Güvenli bölge — araçlar buraya giremez.'},
+  {n:61, cat:'des', jp:'規制予告',           kana:'きせいよこく',             en:'Advance Warning',                               tr:'İleride trafik düzenlemesi olduğunu önceden haber verir.'},
+  // ── 補助標識 (Auxiliary Signs) ──
+  {n:62, cat:'aux', jp:'距離・区域',         kana:'きょり・くいき',           en:'Distance and Zone Designation',                 tr:'Düzenlemenin geçerli olduğu mesafe veya bölge bilgisi.'},
+  {n:63, cat:'aux', jp:'日時',               kana:'にちじ',                   en:'Applicable Date and Time',                      tr:'Düzenlemenin geçerli olduğu gün ve saat aralığı.'},
+  {n:64, cat:'aux', jp:'車種',               kana:'しゃしゅ',                 en:'Types of Applicable Vehicles',                  tr:'Düzenlemenin geçerli olduğu araç türleri.'},
+  {n:65, cat:'aux', jp:'始まり',             kana:'はじまり',                 en:'Start of Traffic Regulation',                   tr:'Düzenlemenin başladığı noktayı gösterir.'},
+  {n:66, cat:'aux', jp:'区間内・区域内',     kana:'くかんない・くいきない',   en:'Zone or Section of Regulation',                 tr:'Düzenlemenin devam ettiği bölge içi.'},
+  {n:67, cat:'aux', jp:'終わり',             kana:'おわり',                   en:'End of Traffic Regulation',                     tr:'Düzenlemenin sona erdiği noktayı gösterir.'},
+  {n:68, cat:'aux', jp:'通学路',             kana:'つうがくろ',               en:'Schooling Route',                               tr:'Okul güzergahı — çocuklar için dikkatli olunmalıdır.'},
+  {n:69, cat:'aux', jp:'踏切あり',           kana:'ふみきりあり',             en:'Railroad Crossing',                             tr:'Demiryolu geçidi yakında — yavaşla ve dikkat et.'},
+  {n:70, cat:'aux', jp:'横風注意',           kana:'よこかぜちゅうい',         en:'Side Wind',                                     tr:'Yan rüzgar uyarısı — direksiyon hakimiyetine dikkat et.'},
+  {n:71, cat:'aux', jp:'動物注意',           kana:'どうぶつちゅうい',         en:'Animals',                                       tr:'Hayvan geçişi olabilir — yavaşla ve dikkat et.'},
+  {n:72, cat:'aux', jp:'注意',               kana:'ちゅうい',                 en:'Caution',                                       tr:'Dikkat uyarısı — genel uyarı levhası.'},
+  {n:73, cat:'aux', jp:'特定の事項の注意',   kana:'とくていのじこうのちゅうい', en:'Caution on Specific Items',                   tr:'Özel bir konu hakkında dikkat uyarısı.'},
+  {n:74, cat:'aux', jp:'規制理由',           kana:'きせいりゆう',             en:'Explanation for Traffic Regulation',            tr:'Trafik düzenlemesinin nedenini açıklar.'},
+  {n:75, cat:'aux', jp:'方向',               kana:'ほうこう',                 en:'Direction',                                     tr:'Levhada belirtilen yol/tesis/yerin yönünü gösterir.'},
+  {n:76, cat:'aux', jp:'地名',               kana:'ちめい',                   en:'Place Name',                                    tr:'Yer adı belirtir.'},
+];
+
+let _signsFilter = 'all';
+let _signsSearch = '';
+
+function buildSigns() {
+  const CAT_LABEL = {reg:'規制', des:'指示', aux:'補助'};
+  const CAT_BADGE = {reg:'badge-reg', des:'badge-des', aux:'badge-aux'};
+  const grid = document.getElementById('signs-grid');
+  if (!grid) return;
+  const q = _signsSearch.toLowerCase();
+  const cards = SIGNS.filter(s => {
+    if (_signsFilter !== 'all' && s.cat !== _signsFilter) return false;
+    if (!q) return true;
+    return s.jp.includes(q) || s.kana.includes(q) || s.en.toLowerCase().includes(q) || s.tr.toLowerCase().includes(q) || String(s.n) === q;
+  }).map(s =>
+    '<div class="sign-card">' +
+      '<div class="sign-num">#' + s.n + '</div>' +
+      '<span class="sign-cat-badge ' + CAT_BADGE[s.cat] + '">' + CAT_LABEL[s.cat] + '標識</span>' +
+      '<img src="signs/ef1_' + String(s.n).padStart(3,'0') + '.png" alt="' + s.en + '" loading="lazy">' +
+      '<div class="sign-jp">' + s.jp + '</div>' +
+      '<div class="sign-jpkana">' + s.kana + '</div>' +
+      '<div class="sign-en">' + s.en + '</div>' +
+      '<div class="sign-tr">' + s.tr + '</div>' +
+    '</div>'
+  );
+  grid.innerHTML = cards.length ? cards.join('') : '<p style="color:#666;grid-column:1/-1">Sonuç bulunamadı.</p>';
+}
+
+function filterSignCat(cat, btn) {
+  _signsFilter = cat;
+  document.querySelectorAll('#tab-levhalar .sign-cat-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  buildSigns();
+}
+
+function filterSigns() {
+  _signsSearch = document.getElementById('signs-search').value;
+  buildSigns();
+}
+
+// ===== WB_QUIZ DATA (WORKBOOK SCRAPE 3x50) =====
+const WB_QUIZ = {
+  'A': [
+    {jp:'止まっている通学・通園バスのそばを通るときは、徐行し、安全を確かめなければならない。', ans:true, img:null},
+    {jp:'この標識のある道路では、車両のかげから子供が急に飛び出してくることが予測されるので、特に注意して走行することが必要である。', ans:true, img:'workbook_imgs/q18298_2_N00138_q.png'},
+    {jp:'追越しをするときは、前の車との車間距離をできるだけつめて、その直近から追い越した方がよい。', ans:false, img:null},
+    {jp:'信号のある交差点では、前方の信号に従わなければならず、横の信号が赤になったからといって発進してはならない。', ans:true, img:null},
+    {jp:'自動車の運転技能が身についていれば十分で、自動車の死角や内輪差など自動車の特性を知っている必要はない。', ans:false, img:null},
+    {jp:'この標示のある交差点で右折する自動車は、対向車がない場合、矢印に従う必要はない。', ans:false, img:'workbook_imgs/q18298_6_N00298_q.png'},
+    {jp:'学校に遅刻しそうだったので、運転者に先を急がせた。', ans:false, img:null},
+    {jp:'標識や標示で最高速度が指定されていても、交通量の少ないときは、その速度を超えて運転してもよい。', ans:false, img:null},
+    {jp:'自動車に乗る前に、前後、左右などの死角をよく確かめることが必要である。', ans:true, img:null},
+    {jp:'前の車が自動車を追い越そうとしているときであっても、その右側に追い越すのに十分な余地があれば、さらにその車を追い越してもよい。', ans:false, img:null},
+    {jp:'交差点で右折しようとするとき、反対方向から直進してくる二輪車がある場合は、自分の自動車に優先権があるので先に右折することができる。', ans:false, img:null},
+    {jp:'この標示のある道路では、指定された区分に従って通行した方が安全であるが、必ずしも従う必要はない。', ans:false, img:'workbook_imgs/q18298_12_N00330_q.png'},
+    {jp:'決められた速度の範囲であれば、急発進、急加速を繰り返してもよい。', ans:false, img:null},
+    {jp:'交通量の少ない道路で進路を変更するときは、危なくないので合図さえすれば、安全確認までする必要はない。', ans:false, img:null},
+    {jp:'この標識は、自動車はもちろん、原動機付自転車、自転車、歩行者などすべての通行を禁止している。', ans:true, img:'workbook_imgs/q18298_15_N00040_q.png'},
+    {jp:'左右の見通しのきかない交差点であっても、優先道路を通行しているときは徐行しなくてもよい。', ans:true, img:null},
+    {jp:'歩行者が進路の前方の横断歩道を横断しようとしているときは、横断しているときと同じように、横断歩道の手前（停止線があるときは、その手前）で一時停止しなければならない。', ans:true, img:null},
+    {jp:'この信号に対面する車は、停止位置で一時停止し、安全確認をした後に進むことができる。', ans:true, img:'workbook_imgs/q18298_18_N00006_q.png'},
+    {jp:'歩行者のそばを通るときは、歩行者との間に安全な間隔を空けるか、徐行しなければならない。', ans:true, img:null},
+    {jp:'酒を飲んで運転したり、飲んでいる人が運転する車に乗ってはいけない。', ans:true, img:null},
+    {jp:'追越しのため最も右側の車両通行帯を通行する場合であっても、前の車の追い越しが終わったときは、速やかにそれ以外の車両通行帯に戻らなくてはならない。', ans:true, img:null},
+    {jp:'踏切で一時停止したとき、警報機が鳴り始めたが、列車の姿がまったく見えなかったので、急いで通過した。', ans:false, img:null},
+    {jp:'オートマチック車を駐車するときは、チェンジレバーをＤに入れ、ハンドブレーキを確実に引いて駐車するのが基本である。', ans:false, img:null},
+    {jp:'正しい運転姿勢は、安全運転の第一歩であり技能教習でならった通りにした方がよい。', ans:true, img:null},
+    {jp:'道路の左側部分の交通が混雑しているときは、中央線から右の部分や路側帯を通行することができる。', ans:false, img:null},
+    {jp:'前方の交差点の信号が青であるが、渋滞していてその交差点内で停止してしまうおそれがあるときは、交差点に入ってはならない。', ans:true, img:null},
+    {jp:'この標識のある道路では、車（自動車、原動機付自転車、軽車両）は通行できない。', ans:true, img:'workbook_imgs/q18298_27_N00041_q.png'},
+    {jp:'車両通行帯のある道路では、やむを得ない場合を除き、二つの車両通行帯にまたがって通行してはならない。', ans:true, img:null},
+    {jp:'この図のような標示がある場所では、Aの車両通行帯を通行する車は、Bの車両通行帯へ進路を変えることができる。', ans:true, img:'workbook_imgs/q18298_29_N00266_q.png'},
+    {jp:'これは、左折又は同じ方向に進行しながら進路を左方に変えるときの合図である。', ans:false, img:'workbook_imgs/q18298_30_N00369_q.png'},
+    {jp:'雨にぬれた道路を走る場合は、制動距離が長くなる。', ans:true, img:null},
+    {jp:'前方の信号が赤色に変わったばかりだったのでそのまま進んだ。', ans:false, img:null},
+    {jp:'普通免許を受けている者は、普通自動車のほか、小型特殊自動車と一般原動機付自転車を運転することができる。', ans:true, img:null},
+    {jp:'進路変更は、後方から接近する車との十分な距離がない場合であっても、素早く進路を変えた方がよい。', ans:false, img:null},
+    {jp:'運転免許証等のコピーを持っていれば、運転中に本物の運転免許証等は持たなくてもよい。', ans:false, img:null},
+    {jp:'道路を通行するときは、交通規則を守ることはもちろん、それ以外にも、道路や交通の状況に応じて、他の人々が安全に通行できるよう配慮する。', ans:true, img:null},
+    {jp:'この標識のある交差点では、一時停止し、交差道路を通行する車などの進行を妨げないように、安全を確認して通過しなければならない。', ans:true, img:'workbook_imgs/q18298_37_N00560_q.png'},
+    {jp:'バックで発進することは危険なので、車庫などに自動車を入れるときは、バックで駐車しておくのがよい。', ans:true, img:null},
+    {jp:'車を発進させるときに、バックミラーで安全を確認するだけでは、後方からの車の動きがわかりにくいので、自分の目で直接確かめることが大切である。', ans:true, img:null},
+    {jp:'運転中少しくらいだったらスマートフォンを使用してもよい。', ans:false, img:null},
+    {jp:'時差式信号機のときは、対向車が進行しても前方の信号が青であるとは限らないので、必ず対面する前方の信号を確認しそれに従う必要がある。', ans:true, img:null},
+    {jp:'二輪車を追い越すときは、車の風圧などのため相手が転倒することのないように、二輪車との間に安全な間隔を保って通行する配慮が大切である。', ans:true, img:null},
+    {jp:'この標識は、一方通行を示し、矢印の示す方向の反対方向には通行できない。', ans:false, img:'workbook_imgs/q18298_43_N00363_q.png'},
+    {jp:'一般道路での、最高速度が標識や標示で指定されていないときは、時速80キロメートルまで速度を出して運転してもよい。', ans:false, img:null},
+    {jp:'交通量が少ない道路であっても、進路変更をする場合は、安全確認を確実に行わなければならない。', ans:true, img:null},
+    {jp:'自動車や一般原動機付自転車を追い越すときは、原則として、その右側を通行しなければならない。', ans:true, img:null},
+    {jp:'交差点やその付近で緊急自動車が近づいてきたので、交差点内の左端に寄って進路を譲った。', ans:false, img:null},
+    {jp:'停留所に止まっている路線バスが発進の合図をしたので、警音器を鳴らし路線バスに注意を与えて、その側方を通過した。', ans:false, img:null},
+    {jp:'運転するときのくつは、ハイヒールやげたがよい。', ans:false, img:null},
+    {jp:'身体障害者用の車いすで通行している人や、盲導犬を連れた人がある場合、一時停止か徐行をしてこれらの人が安全に通行できるようにしなければならない。', ans:true, img:null}
+  ],
+  'B': [
+    {jp:'アンチロックブレーキシステム（走行中に自動車の制御に著しい支障を及ぼす車輪の回転運動の停止を有効に防止できる装置）を備えた自動車で急停止する場合には、システムを作動させるために、 ブレーキペダルを軽く数回に分けて踏めばよい。', ans:false, img:null},
+    {jp:'見通しのよい踏切を通過するときは、踏切の直前（停止線があるときは、その直前）で一時停止をする必要はなく、徐行しながら安全を確かめればよい。', ans:false, img:null},
+    {jp:'標識や標示で追い越しのために右側部分にはみ出すことが禁止されていても、見通しのよい道路であれば右側部分にはみ出すことができる。', ans:false, img:null},
+    {jp:'運転者が疲れているときは、注意力が散漫になるなど、危険を認知して判断する（空走距離）までに時間がかかるようになる。', ans:true, img:null},
+    {jp:'自動車や一般原動機付自転車は、歩道や路側帯や自転車道などであっても、道路に面した場所に出入りするため横切る場合は通行することができる。', ans:true, img:null},
+    {jp:'この標識は、路線バス等の優先通行帯を示すもので、路線バスが近づいたときは、速やかに他の通行帯に移らなければならない。', ans:true, img:'workbook_imgs/q18299_6_N00092_q.png'},
+    {jp:'ほかの車の前方に急に割り込んだり、併進している車に幅寄せをしてはならない。', ans:true, img:null},
+    {jp:'前方の信号が黄色に変わったとき、停止線に近づいていて安全に停止することができなかったのでそのまま進んだ。', ans:true, img:null},
+    {jp:'この信号に対面する自動車は、赤信号であっても交差点を右折することができる。', ans:true, img:'workbook_imgs/q18299_9_N00010_q.png'},
+    {jp:'自動車や一般原動機付自転車が、同じ方向に進行しながら進路を左方に変える（進路変更）ときの合図の時期は、進路を変えようとする時の約3秒前である。', ans:true, img:null},
+    {jp:'道路の曲がり角付近では、前方の見通しが悪く、追越しは危険であるが、車両通行帯のある道路の場合は、曲がり角付近であっても追越しをしてもよい。', ans:false, img:null},
+    {jp:'同一方向に二つの車両通行帯があるときは、標識や標示により通行区分が示されているときを除き、原則として左側の車両通行帯を通行しなければならない。', ans:true, img:null},
+    {jp:'横断歩道に歩行者がいないときは、横断歩道から30メートル以内の道路の部分でも追越しのため進路を変更することができる。', ans:false, img:null},
+    {jp:'混雑している交差点を右折する場合は、対向車の切れ目をぬって最短距離で右折してもかまわない。', ans:false, img:null},
+    {jp:'前方の交差点で直進するとき、誤って左折の合図を出したが、そのまま方向指示器を消さずに直進した。', ans:false, img:null},
+    {jp:'この標識のある道路では、積載した荷物の高さも含め、車の高さが3.3メートルを超える車 は通行できない。', ans:true, img:'workbook_imgs/q18299_16_N00071_q.png'},
+    {jp:'この図のように、交差点の手前で車両通行帯が黄の線で区画されているところでは、右左折のためであっても進路変更してはいけない。', ans:true, img:'workbook_imgs/q18299_17_N00553_q.png'},
+    {jp:'この標識がある道路では、一般原動機付自転車も時速50キロメートルで走行してよい。', ans:false, img:'workbook_imgs/q18299_18_N00073_q.png'},
+    {jp:'車両通行帯のない道路では、追越しなどでやむを得ない場合のほか、道路の左側によって通行する。', ans:true, img:null},
+    {jp:'進路の前方に障害物がある場合、あらかじめ一時停止か減速して、反対方向から進行してくる車を先に通行させる。', ans:true, img:null},
+    {jp:'信号機のある交差点の手前に表示されている停止線は、車の停止位置の目安であるから少しくらいなら超えて停止してもよい。', ans:false, img:null},
+    {jp:'この標識のある道路では、自動車や一般原動機付自転車の運転者は、歩行者と自転車に注意しながら通行することができる。', ans:false, img:'workbook_imgs/q18299_22_N00080_q.png'},
+    {jp:'止まっている自動車のすぐ近くを通るときは、その自動車のドアが急に開くかもしれないことを予測して、徐行したり、安全な間隔を保ったりするなど注意する必要がある。', ans:true, img:null},
+    {jp:'この標識のある道路では、二輪の自動車以外の自動車は通行できない。', ans:true, img:'workbook_imgs/q18299_24_N00043_q.png'},
+    {jp:'横断歩道のない交差点やその近くを横断している歩行者があるときは、警音器を鳴らし、注意をうながして通行するのがよい。', ans:false, img:null},
+    {jp:'自動車検査証や自動車損害賠償責任保険証明書は、大切なものなので自宅で保管しておかなければならない。', ans:false, img:null},
+    {jp:'交差点とその付近は、最も交通事故の発生が多い場所であるから、速度を上げて、早く通過するように心掛ける。', ans:false, img:null},
+    {jp:'子供が道路で遊んでいるのを見かけたときは、警音器を鳴らし警告すれば、安全なので徐行しないで通行することができる。', ans:false, img:null},
+    {jp:'この標識がある交差点では、夜9時は右折できる。', ans:true, img:'workbook_imgs/q18299_29_N00396_q.png'},
+    {jp:'運転者は、自動車の乗り降りをするときは、周囲の状況、特に後方からの車の有無を確かめることが必要である。', ans:true, img:null},
+    {jp:'進行方向の信号が、黄色の点滅である場合は、他の交通に注意しながら進行することができる。', ans:true, img:null},
+    {jp:'この標示は、前方に横断歩道又は自転車横断帯があることを示している。', ans:true, img:'workbook_imgs/q18299_32_N00353_q.png'},
+    {jp:'体調が悪いときは、睡眠作用のある薬を服用してから運転するのがよい。', ans:false, img:null},
+    {jp:'運転中は、運転免許証等をいつでも提示することができるように携帯しておかなければならない。', ans:true, img:null},
+    {jp:'歩道や路側帯のない道路では、路端から0.5メートルの部分（路肩）は通行してはならない。（二輪を除く。）', ans:true, img:null},
+    {jp:'シートベルトは、正しい運転姿勢で着用しなければならない。', ans:true, img:null},
+    {jp:'これは高齢者マークであり、70歳以上の高齢者は、普通自動車を運転する場合、その車の前と後ろの定められた位置に付けるようにする。', ans:false, img:'workbook_imgs/q18299_37_N00356_q.png'},
+    {jp:'車を運転するときは、万一の場合に備えて自動車保険に加入したり、応急救護処置に必要な知識を身につけたり、救急用具を車に備えるなど平素から十分な用意をしておく。', ans:true, img:null},
+    {jp:'オートマチック車で後退するときは、ブレーキペダルをしっかり踏んだまま、チェンジレバーをＲに入れ、ハンドブレーキを戻してブレーキペダルを徐々に放し、アクセルペダルを静かに踏んで発進する。', ans:true, img:null},
+    {jp:'安全地帯のそばを通過しようとしたとき、安全地帯に歩行者がいたので徐行した。', ans:true, img:null},
+    {jp:'積載重量に制限はあるが、少しくらいならその制限を超えて運転してもよい。', ans:false, img:null},
+    {jp:'バックで発進する場合で、後方の見通しがよくない場所や、狭い道路から広い道路に出るときは、同乗者に後方の確認を手伝ってもらうとよい。', ans:true, img:null},
+    {jp:'ぬかるみや水たまりのあるところで、歩行者に泥水をはねても、徐行さえしていれば、運転者に責任はない。', ans:false, img:null},
+    {jp:'交通整理中の警察官が、信号機の信号と異なる「止まれ」の手信号をしたが、そのまま交差点に進入した。', ans:false, img:null},
+    {jp:'交通量の多いところでも、自動車の右側に座っている者は、右側のドアから乗り降りした方がよい。', ans:false, img:null},
+    {jp:'一般原動機付自転車の運転者は、標識や標示によって時速20キロメートルの最高速度が示されていても、時速30キロメートルで運転してよい。', ans:false, img:null},
+    {jp:'前方の信号が青のとき、二段階の右折方法により右折する一般原動機付自転車は、右折する地点まで直進し、その地点で向きを変え、向きを変えた後の前方の信号が赤であっても進むことができる。', ans:false, img:null},
+    {jp:'普通免許を受けて1年を経過していない初心運転者であったが、「初心者マーク」を付けるのが恥ずかしかったので、車の見えにくい位置に付けて運転した。', ans:false, img:null},
+    {jp:'道路の左側に路線バスの専用通行帯が指定されているところでは、左折するときでも、その専用通行帯は通行できない。', ans:false, img:null},
+    {jp:'運転免許の停止処分を受けた者が、その停止期間中に運転しても、取り消しではないから無免許運転にならない。', ans:false, img:null}
+  ],
+  'C': [
+    {jp:'霧の中を運転するときは、見通しをよくするため前照灯を上向きにして走行する。', ans:false, img:null},
+    {jp:'図の道路標識は、普通乗用自動車だけの通行止めを表している。', ans:false, img:'workbook_imgs/q16801_2_N00043_q.png'},
+    {jp:'交差点で警察官が「止まれ」の手信号をしていたので、警察官の１メートル手前で停止した。', ans:false, img:null},
+    {jp:'高速自動車国道における大型自動二輪車および普通自動二輪車の法定速度は、８０キロメートル毎時である。', ans:false, img:null},
+    {jp:'貨物自動車の最大積載量は、自動車検査証に記載されている最大積載量の一割増しまで認められている。', ans:false, img:null},
+    {jp:'この標示のある交差点で自動車が右折するときは、交差点の中心の外側を徐行しなければならない。', ans:false, img:'workbook_imgs/q16801_6_N00298_q.png'},
+    {jp:'交差点に入る直前で前方の信号が青色から黄色に変わったが、後ろに車が続いていて急ブレーキをかけると追突されるおそれがあったので、停止せずにそのまま進んだ。', ans:true, img:null},
+    {jp:'大型自動車、中型自動車、準中型自動車、普通自動車、大型特殊自動車の積み荷は、その車の幅を超えてはならない。', ans:false, img:null},
+    {jp:'交通事故で、負傷者がいない物損事故だけのときは、お互いに話し合いがまとまれば、警察官に届け出る必要はない。', ans:false, img:null},
+    {jp:'このような標識のある道路では、普通乗用自動車も大型貨物自動車も４０キロメートル毎時を超える速度で運転してはならない。', ans:true, img:'workbook_imgs/q16801_10_N00074_q.png'},
+    {jp:'交通整理の行われている片側三車線以上の交差点で一般原動機付自転車が右折するときは、標識などによる指定がなければ、二段階の方法によって右折しなければならない。', ans:true, img:null},
+    {jp:'小型特殊自動車と一般原動機付自転車は、それぞれの免許を受けるほか二輪免許、普通免許、準中型免許、中型免許、大型免許および大型特殊免許を受ければ運転できる。', ans:true, img:null},
+    {jp:'図の標識のある道路では、普通乗用自動車以外の自動車は通行できない。', ans:false, img:'workbook_imgs/q16801_13_N00078_q.png'},
+    {jp:'大型自動二輪車、普通自動二輪車で高速走行中は、急ブレーキをかけると横すべりを起こす原因になるので、なるべく避けるべきである。', ans:true, img:null},
+    {jp:'荷台に荷物を積んだとき、方向指示器、尾灯、制動灯、ナンバー・プレートなどが見えなくなるような積み方をしたときは、見張りの者を乗せれば運転してもよい。', ans:false, img:null},
+    {jp:'長い急な下り坂で、フットブレーキだけを続けて使用しても、ブレーキの効きは変わらない。', ans:false, img:null},
+    {jp:'路面電車に乗り降りする人がいるときは、安全地帯の有無に関係なく、乗降客や道路を横断する人がいなくなるまで停止していなければならない。', ans:false, img:null},
+    {jp:'こう配の急な下り坂は徐行しなければならないが、こう配の急な上り坂は徐行しなくともよい。', ans:true, img:null},
+    {jp:'バックで発進する場合、後方の見通しがよくないときは、同乗者などに後方の確認をしてもらうようにする。', ans:true, img:null},
+    {jp:'夜間、運転中に眠気を感じたら窓をあけて新鮮な空気を入れ、少しでも眠くなったら安全な場所に車を止め、短時間でも仮眠をするか休息をとって眠気をさましてから運転をする。', ans:true, img:null},
+    {jp:'追い越しをするときは、対向車との間に安全な間隔を保たなければならないので、追い越す車に接近してもやむを得ない。', ans:false, img:null},
+    {jp:'進路変更をしようとするときは、あらかじめバックミラーなどで後方の安全を確かめてから合図をする。', ans:true, img:null},
+    {jp:'図の標識は、「矢印の方向への一方通行」を意味する。', ans:false, img:'workbook_imgs/q16801_23_N00058_q.png'},
+    {jp:'トンネルに入るときは急に暗くなるので速度を落とすが、出るときは明るくなるので速度を速めたほうがよい。', ans:false, img:null},
+    {jp:'ひとり歩きの子どもや車椅子や白や黄色のつえを持った人や通行に支障のある高齢者などが通行しているときは、減速し、安全な間隔をあけて通らなければならない。', ans:false, img:null},
+    {jp:'ロープで故障車をけん引するときは、ロープの見やすい箇所に０.３メートル平方以上の白い布をつけ、その車を運転できる免許を持っている人にハンドルなどの操作をしてもらう。', ans:true, img:null},
+    {jp:'普通自動二輪車は、すべて２年ごとに検査（車検）を受けなければならない。', ans:false, img:null},
+    {jp:'長い下り坂などでフットブレーキをひんぱんに使うと、ブレーキドラムなどが加熱して、ブレーキ液内に気泡が発生し、ブレーキがきかなくなることがあるので、エンジンブレーキを十分活用するようにする。', ans:true, img:null},
+    {jp:'高速道路のトンネルや切り通しの出口などでは、横風のためにハンドルをとられることがあるので注意しなければならない。', ans:true, img:null},
+    {jp:'図の標識がある道路を普通自動車で通行中、後方から路面電車が接近してきたが、軌道敷内を通行できる標識なので、そのまま通行した。', ans:false, img:'workbook_imgs/q16801_30_N00111_q.png'},
+    {jp:'図の標識のある道路では、車は直進や左折をしてはならない。', ans:false, img:'workbook_imgs/q16801_31_N00053_q.png'},
+    {jp:'５分以内の荷物の積みおろしのための停止は、駐車に該当する。', ans:false, img:null},
+    {jp:'踏切とその端から前後１０メートル以内の場所は、駐車はもちろん停車も禁止されている。', ans:true, img:null},
+    {jp:'高速走行するときのタイヤの空気圧は、摩擦熱のため高くなるので、一般道路を走行するよりやや低くしておくほうがよい。', ans:false, img:null},
+    {jp:'高速自動車国道の中央分離帯が切れているところでは、転回することができる。', ans:false, img:null},
+    {jp:'土ぼこりの多い舗装道路では、雨の降り始めは降っている最中よりもスリップしやすい。', ans:true, img:null},
+    {jp:'二輪車は機動性に富むが、車と車の間をぬうように運転してはいけない。', ans:true, img:null},
+    {jp:'この標識のある場所では、専用場所駐車標章の交付を受けてない人でも駐車できる。', ans:false, img:'workbook_imgs/q16801_38_N00112_q.png'},
+    {jp:'交差点で、対面する信号が青色を表示しているときは、自動車、一般原動機付自転車（二段階右折の交差点を除く）は、ともに直進、左折、右折することができる。', ans:true, img:null},
+    {jp:'霧や吹雪などで見通しの悪いときは、追突を避けるため前車に追従して走行するより先頭を走るのがよい。', ans:false, img:null},
+    {jp:'このような警察官の手信号に対面する交通は、いずれも同じ意味である。', ans:true, img:'workbook_imgs/q16801_41_N00026_q.png'},
+    {jp:'原動機付自転車を追い越している普通自動車を追い越すのは、二重追い越しにならない。', ans:true, img:null},
+    {jp:'図の標示がある優先通行帯は、午前７時から午前９時までは、交通量が少ないときであっても、指定された以外の車は通行してはならない。', ans:false, img:'workbook_imgs/q16801_43_N00287_q.png'},
+    {jp:'「徐行」の標識があっても、見通しがよく明らかに安全であれば、徐行する必要はない。', ans:false, img:null},
+    {jp:'夜間、街路灯がついている明るい道路を通る車は前照灯をつけなくてもよい。', ans:false, img:null},
+    {jp:'追い越し禁止の標識のある場所では、自動車や一般原動機付自転車を追い越すため、進路を変えたり、その横を通りすぎたりしてはならない。', ans:true, img:null},
+    {jp:'停留所に止まっていた路線バスが発進の合図をしていたが、まだ発進しなかったのでその側方を通過した。', ans:false, img:null},
+    {jp:'道路の曲がり角であっても、他の交通の妨げにならないときは、駐車や停車をしてよい。', ans:false, img:null},
+    {jp:'青信号に従って踏切を通過するときは、一時停止しないで通過してもよいが、安全は確かめなければならない。', ans:true, img:null},
+    {jp:'図の路側帯のある道路では、車の左側に０.７５メートル以上の余地をあければ中に入って車を止めることができる。', ans:false, img:'workbook_imgs/q16801_50_N00275_q.png'}
+  ],
+};
+
+const wbScores = {A:{c:0,t:0}, B:{c:0,t:0}, C:{c:0,t:0}};
+const answeredWB = {};
+
+function buildWBQuiz() {
+  ['A','B','C'].forEach(set => {
+    const div = document.getElementById('wb-set-' + set);
+    if (!div) return;
+    const qs = WB_QUIZ[set];
+    div.innerHTML =
+      '<div class="quiz-score-bar">' +
+        '<span>Skor: <span class="quiz-score-val" id="wbscore'+set+'">0 / 0</span></span>' +
+        '<button class="quiz-reset-btn" onclick="resetWBQuiz(\''+set+'\')">↺ Sıfırla</button>' +
+      '</div>' +
+      qs.map((q, i) =>
+        '<div class="quiz-card" id="wbc_'+set+'_'+i+'">' +
+          '<div class="quiz-num">Soru ' + (i+1) + '</div>' +
+          (q.img ? '<img class="quiz-img" src="' + q.img + '" alt="soru resmi" loading="lazy">' : '') +
+          '<div class="quiz-jp">' + q.jp + '</div>' +
+          '<div class="quiz-btns">' +
+            '<button class="qbtn qbtn-maru" onclick="answerWB(\''+set+'\','+i+',true)">○</button>' +
+            '<button class="qbtn qbtn-batu" onclick="answerWB(\''+set+'\','+i+',false)">×</button>' +
+          '</div>' +
+          '<div class="quiz-feedback" id="wbf_'+set+'_'+i+'"></div>' +
+        '</div>'
+      ).join('');
+  });
+}
+
+function answerWB(set, idx, userAns) {
+  const key = set + '_' + idx;
+  if (answeredWB[key]) return;
+  answeredWB[key] = true;
+  const q = WB_QUIZ[set][idx];
+  const correct = (userAns === q.ans);
+  wbScores[set].t++;
+  if (correct) wbScores[set].c++;
+  const card = document.getElementById('wbc_' + set + '_' + idx);
+  const fb = document.getElementById('wbf_' + set + '_' + idx);
+  card.classList.add(correct ? 'quiz-correct' : 'quiz-wrong');
+  fb.innerHTML = correct
+    ? '<span class="qfb-ok">✓ 正解！　正解: ' + (q.ans ? '○' : '×') + '</span>'
+    : '<span class="qfb-ng">✗ 不正解。　正解: ' + (q.ans ? '○' : '×') + '</span>';
+  card.querySelectorAll('.qbtn').forEach(b => b.disabled = true);
+  document.getElementById('wbscore' + set).textContent =
+    wbScores[set].c + ' / ' + wbScores[set].t;
+}
+
+function resetWBQuiz(set) {
+  WB_QUIZ[set].forEach((q, i) => { delete answeredWB[set + '_' + i]; });
+  wbScores[set] = {c:0, t:0};
+  buildWBQuiz();
+  showWBSet(set, null);
+}
+
+function showWBSet(set, btn) {
+  ['A','B','C'].forEach(s => {
+    const el = document.getElementById('wb-set-' + s);
+    if (el) el.style.display = (s === set ? '' : 'none');
+  });
+  document.querySelectorAll('#tab-sinav .wb-set-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+}
+
+// ===== INIT =====
+buildLessons();
+  buildQuiz();
+buildVocabTable(VOCAB);
+updateCard();
+buildSigns();
+buildWBQuiz();
+</script>
+</body>
+</html>
