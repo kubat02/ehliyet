@@ -32,14 +32,8 @@ nav button.active, nav button:hover { background: #2a2a50; color: #ff6b8a; borde
 .lesson-section-title { color: #ff6b8a; font-size: 1.05em; margin: 10px 0 5px; border-left: 3px solid #ff6b8a; padding-left: 10px; font-weight: bold; }
 .lesson-section-sub { color: #888; font-size: 0.8em; margin-left: 13px; margin-bottom: 12px; }
 
-.lesson-detail { background: #111126; border: 1px solid #2a2a50; border-radius: 10px; padding: 16px; margin-bottom: 18px; }
-.lesson-detail-title { color: #ff6b8a; font-size: 1.05em; margin-bottom: 8px; font-weight: bold; }
-.lesson-detail-reading { color: #ccc; font-size: 0.88em; margin-bottom: 8px; }
-.lesson-detail-trans { color: #6aabff; font-size: 0.95em; margin-bottom: 10px; }
-.lesson-detail-summary { color: #d0d0e0; font-size: 0.9em; line-height: 1.6; }
-.lesson-item { background: #1a1a30; border: 1px solid #2a2a50; border-radius: 8px; margin-bottom: 7px; padding: 11px 14px; transition: all 0.15s; display: flex; align-items: center; gap: 12px; cursor: pointer; }
-.lesson-item:hover { border-color: #ff6b8a; background: #1f1433; }
-.lesson-item-active { border-color: #ff6b8a; background: #251339; }
+.lesson-item { background: #1a1a30; border: 1px solid #2a2a50; border-radius: 8px; margin-bottom: 7px; padding: 11px 14px; transition: all 0.15s; display: flex; align-items: center; gap: 12px; }
+.lesson-item:hover { border-color: #2a2a50; background: #1a1a30; }
 .lesson-num { color: #ff6b8a; font-size: 0.78em; min-width: 42px; font-family: monospace; }
 .lesson-jp { font-size: 0.92em; flex: 1; }
 .lesson-en { color: #6aabff; font-size: 0.78em; margin-top: 2px; }
@@ -57,7 +51,6 @@ nav button.active, nav button:hover { background: #2a2a50; color: #ff6b8a; borde
 .quiz-num  { color:#ff6b8a; font-size:0.75em; font-weight:700; margin-bottom:4px; }
 .quiz-jp   { font-size:1.05em; line-height:1.5; margin-bottom:5px; }
 .quiz-hint { color:#6aabff; font-size:0.77em; margin-bottom:10px; }
-.quiz-tr { color:#ffc870; font-size:0.84em; margin-bottom:10px; line-height:1.4; }
 .quiz-btns { display:flex; gap:12px; margin-top:8px; }
 .qbtn { flex:1; padding:10px 0; font-size:1.3em; font-weight:700; border:2px solid #444; border-radius:8px; cursor:pointer; background:#0d0d1f; color:#fff; transition:all 0.15s; }
 .qbtn-maru { border-color:#4caf50; color:#4caf50; }
@@ -177,13 +170,6 @@ nav button.active, nav button:hover { background: #2a2a50; color: #ff6b8a; borde
     <button class="sec-btn active" onclick="showSection(11, this)">教習項目 11<br><small>追い越し / Overtaking</small></button>
     <button class="sec-btn" onclick="showSection(12, this)">教習項目 12<br><small>免許 / License</small></button>
     <button class="sec-btn" onclick="showSection(13, this)">教習項目 13<br><small>AT車・死角 / AT & Blind Spots</small></button>
-  </div>
-
-  <div class="lesson-detail" id="lesson-detail" style="display:none;">
-    <div class="lesson-detail-title" id="lesson-detail-title"></div>
-    <div class="lesson-detail-reading" id="lesson-detail-reading"></div>
-    <div class="lesson-detail-trans" id="lesson-detail-trans"></div>
-    <div class="lesson-detail-summary" id="lesson-detail-summary"></div>
   </div>
 
   <div class="lesson-group active" id="section11">
@@ -412,47 +398,47 @@ nav button.active, nav button:hover { background: #2a2a50; color: #ff6b8a; borde
 // ===== LESSON DATA =====
 const LESSONS = {
   11: [
-    {id:'2130', jp:'追い越しの禁止', en:'Overtaking — Overview & Prohibition', r:'oikoshi no kinshi'},
-    {id:'2131', jp:'追い越しと追い抜きの意味', en:'Meaning of Overtaking vs. Passing', r:'oikoshi to oinuki no imi'},
-    {id:'2132', jp:'追い越しを禁止する場合', en:'Situations Prohibiting Overtaking', r:'oikoshi o kinshi suru baai'},
-    {id:'2133', jp:'追い越しを禁止する場所', en:'Places Prohibiting Overtaking', r:'oikoshi o kinshi suru basho'},
-    {id:'2134', jp:'右側部分へのはみ出し追い越しの禁止', en:'Prohibiting Crossing into Oncoming Lane', r:'migigawa bubun e no hamidashi oikoshi no kinshi'},
-    {id:'2135', jp:'追い越しの方法', en:'How to Overtake', r:'oikoshi no hoho'},
-    {id:'2137', jp:'右側追い越しと左側通過', en:'Right-side Overtake & Left-side Pass', r:'migigawa oikoshi to hidari gawa tsuuka'},
-    {id:'2138', jp:'路面電車を追い越す場合', en:'Overtaking a Tram / Streetcar', r:'romen densha o oikoseru baai'},
-    {id:'2139', jp:'安全な側方間隔の保持', en:'Maintaining Safe Side Clearance', r:'anzen na sokuhou kankaku no hoji'},
-    {id:'2140', jp:'追い越しの運転手順', en:'Step-by-Step Overtaking Procedure', r:'oikoshi no unten tetsuzuki'},
-    {id:'2141', jp:'追い越されるときの注意 ①', en:'Caution When Being Overtaken (1)', r:'oikoserareru toki no chuui ichi'},
-    {id:'2142', jp:'追い越されるときの注意 ②', en:'Caution When Being Overtaken (2)', r:'oikoserareru toki no chuui ni'},
-    {id:'2144', jp:'側方間隔の保持 ①', en:'Maintaining Side Clearance (1)', r:'sokuhou kankaku no hoji ichi'},
-    {id:'2145', jp:'側方間隔の保持 ②', en:'Maintaining Side Clearance (2)', r:'sokuhou kankaku no hoji ni'},
-    {id:'2146', jp:'障害物があるときの避譲 ①', en:'Yielding Around Obstacles (1)', r:'shogai butsu ga aru toki no hiyu ichi'},
-    {id:'2147', jp:'障害物があるときの避譲 ②', en:'Yielding Around Obstacles (2)', r:'shogai butsu ga aru toki no hiyu ni'},
+    {id:'2130', jp:'追い越しの禁止', en:'Overtaking — Overview & Prohibition'},
+    {id:'2131', jp:'追い越しと追い抜きの意味', en:'Meaning of Overtaking vs. Passing'},
+    {id:'2132', jp:'追い越しを禁止する場合', en:'Situations Prohibiting Overtaking'},
+    {id:'2133', jp:'追い越しを禁止する場所', en:'Places Prohibiting Overtaking'},
+    {id:'2134', jp:'右側部分へのはみ出し追い越しの禁止', en:'Prohibiting Crossing into Oncoming Lane'},
+    {id:'2135', jp:'追い越しの方法', en:'How to Overtake'},
+    {id:'2137', jp:'右側追い越しと左側通過', en:'Right-side Overtake & Left-side Pass'},
+    {id:'2138', jp:'路面電車を追い越す場合', en:'Overtaking a Tram / Streetcar'},
+    {id:'2139', jp:'安全な側方間隔の保持', en:'Maintaining Safe Side Clearance'},
+    {id:'2140', jp:'追い越しの運転手順', en:'Step-by-Step Overtaking Procedure'},
+    {id:'2141', jp:'追い越されるときの注意 ①', en:'Caution When Being Overtaken (1)'},
+    {id:'2142', jp:'追い越されるときの注意 ②', en:'Caution When Being Overtaken (2)'},
+    {id:'2144', jp:'側方間隔の保持 ①', en:'Maintaining Side Clearance (1)'},
+    {id:'2145', jp:'側方間隔の保持 ②', en:'Maintaining Side Clearance (2)'},
+    {id:'2146', jp:'障害物があるときの避譲 ①', en:'Yielding Around Obstacles (1)'},
+    {id:'2147', jp:'障害物があるときの避譲 ②', en:'Yielding Around Obstacles (2)'},
   ],
   12: [
-    {id:'2149', jp:'運転免許のしくみ', en:'Structure of Driving Licenses', r:'unten menkyo no shikumi'},
-    {id:'2150', jp:'無免許運転の禁止', en:'Prohibition of Unlicensed Driving', r:'mumenkyo unten no kinshi'},
-    {id:'2151', jp:'運転免許証の携帯と提示', en:'Carrying & Presenting Your License', r:'unten menkyo sho no keitai to teiji'},
-    {id:'2152', jp:'免許の種類と運転できる自動車など', en:'License Types & Vehicles Permitted', r:'menkyo no shurui to unten dekiru jidousha nado'},
-    {id:'2153', jp:'必要な運転経験など', en:'Required Driving Experience', r:'hitsuyou na unten keiken nado'},
-    {id:'2154', jp:'けん引免許', en:'Towing License', r:'ken'in menkyo'},
-    {id:'2155', jp:'仮免許による運転', en:'Driving with a Provisional License', r:'karimenkyo ni yoru unten'},
+    {id:'2149', jp:'運転免許のしくみ', en:'Structure of Driving Licenses'},
+    {id:'2150', jp:'無免許運転の禁止', en:'Prohibition of Unlicensed Driving'},
+    {id:'2151', jp:'運転免許証の携帯と提示', en:'Carrying & Presenting Your License'},
+    {id:'2152', jp:'免許の種類と運転できる自動車など', en:'License Types & Vehicles Permitted'},
+    {id:'2153', jp:'必要な運転経験など', en:'Required Driving Experience'},
+    {id:'2154', jp:'けん引免許', en:'Towing License'},
+    {id:'2155', jp:'仮免許による運転', en:'Driving with a Provisional License'},
   ],
   13: [
-    {id:'2184', jp:'オートマチック車の運転', en:'Driving an Automatic (AT) Vehicle', r:'ootomatikku sha no unten'},
-    {id:'2185', jp:'オートマチック車（四輪車）の運転時の注意', en:'Cautions: AT Four-Wheel Vehicle', r:'ootomatikku sha yonrinsha no untenji no chuui'},
-    {id:'2186', jp:'オートマチック二輪車の運転時の注意', en:'Cautions: AT Motorcycle', r:'ootomatikku nirinsha no untenji no chuui'},
-    {id:'2198', jp:'二輪車・四輪車からの見えかた ①', en:'Visibility: Motorcycle vs. Car View (1)', r:'nirinsha yonrinsha kara no mieta kata ichi'},
-    {id:'2199', jp:'二輪車・四輪車からの見えかた ②', en:'Visibility: Motorcycle vs. Car View (2)', r:'nirinsha yonrinsha kara no mieta kata ni'},
-    {id:'2200', jp:'死角の事例', en:'Examples of Blind Spots', r:'shikaku no jirei'},
-    {id:'2201', jp:'自動車自体の死角', en:"Vehicle's Own Blind Spots", r:'jidousha jitai no shikaku'},
-    {id:'2202', jp:'駐車車両がつくる死角', en:'Blind Spots from Parked Vehicles', r:'chuusha sha ga tsukuru shikaku'},
-    {id:'2203', jp:'交差点での死角', en:'Blind Spots at Intersections', r:'kousaten de no shikaku'},
-    {id:'2204', jp:'カーブがつくる死角', en:'Blind Spots Created by Curves', r:'kaabu ga tsukuru shikaku'},
-    {id:'2205', jp:'防衛的運転方法', en:'Defensive Driving Methods', r:'bouei teki unten houhou'},
-    {id:'2207', jp:'適切な走行ポジション', en:'Appropriate Road Position', r:'tekisetsu na sokou pojishon'},
-    {id:'2208', jp:'車両間の意思疎通の方法', en:'Communication Between Vehicles', r:'sharyou kan no ishi sotsuu no houhou'},
-    {id:'2209', jp:'交差点でのパッシング', en:'Flashing Headlights at Intersections', r:'kousaten de no passing'},
+    {id:'2184', jp:'オートマチック車の運転', en:'Driving an Automatic (AT) Vehicle'},
+    {id:'2185', jp:'オートマチック車（四輪車）の運転時の注意', en:'Cautions: AT Four-Wheel Vehicle'},
+    {id:'2186', jp:'オートマチック二輪車の運転時の注意', en:'Cautions: AT Motorcycle'},
+    {id:'2198', jp:'二輪車・四輪車からの見えかた ①', en:'Visibility: Motorcycle vs. Car View (1)'},
+    {id:'2199', jp:'二輪車・四輪車からの見えかた ②', en:'Visibility: Motorcycle vs. Car View (2)'},
+    {id:'2200', jp:'死角の事例', en:'Examples of Blind Spots'},
+    {id:'2201', jp:'自動車自体の死角', en:"Vehicle's Own Blind Spots"},
+    {id:'2202', jp:'駐車車両がつくる死角', en:'Blind Spots from Parked Vehicles'},
+    {id:'2203', jp:'交差点での死角', en:'Blind Spots at Intersections'},
+    {id:'2204', jp:'カーブがつくる死角', en:'Blind Spots Created by Curves'},
+    {id:'2205', jp:'防衛的運転方法', en:'Defensive Driving Methods'},
+    {id:'2207', jp:'適切な走行ポジション', en:'Appropriate Road Position'},
+    {id:'2208', jp:'車両間の意思疎通の方法', en:'Communication Between Vehicles'},
+    {id:'2209', jp:'交差点でのパッシング', en:'Flashing Headlights at Intersections'},
   ]
 };
 
@@ -596,8 +582,8 @@ function showTab(name, btn) {
 
 // ===== SECTION SYSTEM =====
 function showSection(num, btn) {
-  document.querySelectorAll('#tab-dersler .lesson-group').forEach(g => g.classList.remove('active'));
-  document.querySelectorAll('#tab-dersler .section-btns .sec-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.lesson-group').forEach(g => g.classList.remove('active'));
+  document.querySelectorAll('.sec-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('section' + num).classList.add('active');
   btn.classList.add('active');
 }
@@ -607,7 +593,7 @@ function showSection(num, btn) {
 function showQSection(num, btn) {
   document.querySelectorAll('#tab-sorular .q-group').forEach(g => g.style.display = 'none');
   document.getElementById('qsection' + num).style.display = 'block';
-  document.querySelectorAll('#tab-sorular .section-btns .sec-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('#tab-sorular .sec-btn').forEach(b => b.classList.remove('active'));
   if (btn) btn.classList.add('active');
 }
 
@@ -733,35 +719,18 @@ function resetQuiz(sec) {
 }
 
 function buildLessons() {
-  const detail = document.getElementById('lesson-detail');
-  if (detail) detail.style.display = 'none';
   [11, 12, 13].forEach(sec => {
     const container = document.getElementById('section' + sec);
-    LESSONS[sec].forEach((l, i) => {
+    LESSONS[sec].forEach(l => {
       const div = document.createElement('div');
       div.className = 'lesson-item';
-      div.id = 'lesson-' + sec + '-' + i;
       div.innerHTML =
         '<span class="lesson-num">#' + l.id + '</span>' +
         '<span class="lesson-jp">' + l.jp + '<br><span class="lesson-en">' + l.en + '</span></span>';
-      div.onclick = () => selectLesson(sec, i);
+      div.style.cursor = 'default';
       container.appendChild(div);
     });
   });
-}
-
-function selectLesson(sec, idx) {
-  const lesson = LESSONS[sec][idx];
-  const detail = document.getElementById('lesson-detail');
-  if (!detail) return;
-  detail.style.display = 'block';
-  document.getElementById('lesson-detail-title').textContent = lesson.jp;
-  document.getElementById('lesson-detail-reading').textContent = lesson.r ? 'Okunuş: ' + lesson.r : '';
-  document.getElementById('lesson-detail-trans').textContent = 'English: ' + lesson.en;
-  document.getElementById('lesson-detail-summary').textContent = 'Ders özeti: ' + lesson.en;
-  document.querySelectorAll('#tab-dersler .lesson-item').forEach(item => item.classList.remove('lesson-item-active'));
-  const activeItem = document.getElementById('lesson-' + sec + '-' + idx);
-  if (activeItem) activeItem.classList.add('lesson-item-active');
 }
 
 // ===== VOCAB TABLE =====
@@ -978,17 +947,17 @@ function filterSigns() {
 // ===== WB_QUIZ DATA (WORKBOOK SCRAPE 3x50) =====
 const WB_QUIZ = {
   'A': [
-    {jp:'止まっている通学・通園バスのそばを通るときは、徐行し、安全を確かめなければならない。', en:'When passing a stopped school/kindergarten bus, must crawl and confirm safety.', tr:'Duran okul/anaokulu otobüsünün yanından geçerken yavaşla ve güvenliği kontrol et.', ans:true, img:null},
-    {jp:'この標識のある道路では、車両のかげから子供が急に飛び出してくることが予測されるので、特に注意して走行することが必要である。', en:'This sign warns that children may suddenly appear from behind parked vehicles.', tr:'Bu işaret parked araçların arkasından çocukların aniden çıkabileceğini gösterir — dikkatli ol.', ans:true, img:'workbook_imgs/q18298_2_N00138_q.png'},
-    {jp:'追越しをするときは、前の車との車間距離をできるだけつめて、その直近から追い越した方がよい。', en:'When overtaking, reduce the gap with the car ahead and overtake from very close.', tr:'Araç geçerken önceki araçla arası kapat ve hemen yanından geç — YANLIŞ!', ans:false, img:null},
-    {jp:'信号のある交差点では、前方の信号に従わなければならず、横の信号が赤になったからといって発進してはならない。', en:'At signaled intersections, follow the signal facing you; do not go if the side signal turns red.', tr:'Işıklı kavşakta sana bakan sinyale uy; yan sinyali kırmızıya dönerse gitme.', ans:true, img:null},
-    {jp:'自動車の運転技能が身についていれば十分で、自動車の死角や内輪差など自動車の特性を知っている必要はない。', en:'Driving skill is enough; no need to know about vehicle blind spots or turning radius.', tr:'Sürüş becerisi yeterli; araçtaki kör noktalar veya dönüş yarıçapını bilmeye gerek yok — YANLIŞ!', ans:false, img:null},
-    {jp:'この標示のある交差点で右折する自動車は、対向車がない場合、矢印に従う必要はない。', en:'At this marking, if there is no oncoming traffic, a right-turning car need not follow the arrow.', tr:'Bu işaretin olduğu yerde sağa dönerken, karşıdan araç yoksa oka uymanız gerekmez — YANLIŞ!', ans:false, img:'workbook_imgs/q18298_6_N00298_q.png'},
-    {jp:'学校に遅刻しそうだったので、運転者に先を急がせた。', en:'I was late for school, so I urged the driver to hurry.', tr:'Okula geç kalıyordum, yüzden sürücüyü hızlanması için ikna ettim — YANLIŞ!', ans:false, img:null},
-    {jp:'標識や標示で最高速度が指定されていても、交通量の少ないときは、その速度を超えて運転してもよい。', en:'Even if max speed is posted, you can exceed it when traffic is light.', tr:'Maksimum hız işaretli olsa da, trafik az ise hızı aşabilirsin — YANLIŞ!', ans:false, img:null},
-    {jp:'自動車に乗る前に、前後、左右などの死角をよく確かめることが必要である。', en:'Before entering a car, check blind spots around the vehicle.', tr:'Arabaya binmeden önce, araçın çevresindeki kör noktaları kontrol et.', ans:true, img:null},
-    {jp:'前の車が自動車を追い越そうとしているときであっても、その右側に追い越すのに十分な余地があれば、さらにその車を追い越してもよい。', en:'Even if a car ahead is overtaking, you may overtake it if there is enough space on the right.', tr:'Öndeki araç geçerken, sağında yeterli yer varsa siz de geçebilirsiniz — YANLIŞ!', ans:false, img:null},
-    {jp:'交差点で右折しようとするとき、反対方向から直進してくる二輪車がある場合は、自分の自動車に優先権があるので先に右折することができる。', en:'When turning right at an intersection, if a motorcycle is coming straight from the opposite direction, you have priority.', tr:'Sağa dönüş yaparken, karşıdan gelen motosikleti karşıdan geçirmelisin — YANLIŞ!', ans:false, img:null},
+    {jp:'止まっている通学・通園バスのそばを通るときは、徐行し、安全を確かめなければならない。', ans:true, img:null},
+    {jp:'この標識のある道路では、車両のかげから子供が急に飛び出してくることが予測されるので、特に注意して走行することが必要である。', ans:true, img:'workbook_imgs/q18298_2_N00138_q.png'},
+    {jp:'追越しをするときは、前の車との車間距離をできるだけつめて、その直近から追い越した方がよい。', ans:false, img:null},
+    {jp:'信号のある交差点では、前方の信号に従わなければならず、横の信号が赤になったからといって発進してはならない。', ans:true, img:null},
+    {jp:'自動車の運転技能が身についていれば十分で、自動車の死角や内輪差など自動車の特性を知っている必要はない。', ans:false, img:null},
+    {jp:'この標示のある交差点で右折する自動車は、対向車がない場合、矢印に従う必要はない。', ans:false, img:'workbook_imgs/q18298_6_N00298_q.png'},
+    {jp:'学校に遅刻しそうだったので、運転者に先を急がせた。', ans:false, img:null},
+    {jp:'標識や標示で最高速度が指定されていても、交通量の少ないときは、その速度を超えて運転してもよい。', ans:false, img:null},
+    {jp:'自動車に乗る前に、前後、左右などの死角をよく確かめることが必要である。', ans:true, img:null},
+    {jp:'前の車が自動車を追い越そうとしているときであっても、その右側に追い越すのに十分な余地があれば、さらにその車を追い越してもよい。', ans:false, img:null},
+    {jp:'交差点で右折しようとするとき、反対方向から直進してくる二輪車がある場合は、自分の自動車に優先権があるので先に右折することができる。', ans:false, img:null},
     {jp:'この標示のある道路では、指定された区分に従って通行した方が安全であるが、必ずしも従う必要はない。', ans:false, img:'workbook_imgs/q18298_12_N00330_q.png'},
     {jp:'決められた速度の範囲であれば、急発進、急加速を繰り返してもよい。', ans:false, img:null},
     {jp:'交通量の少ない道路で進路を変更するときは、危なくないので合図さえすれば、安全確認までする必要はない。', ans:false, img:null},
@@ -1153,8 +1122,6 @@ function buildWBQuiz() {
           '<div class="quiz-num">Soru ' + (i+1) + '</div>' +
           (q.img ? '<img class="quiz-img" src="' + q.img + '" alt="soru resmi" loading="lazy">' : '') +
           '<div class="quiz-jp">' + q.jp + '</div>' +
-          (q.en ? '<div class="quiz-hint">' + q.en + '</div>' : '') +
-          (q.tr ? '<div class="quiz-tr">' + q.tr + '</div>' : '') +
           '<div class="quiz-btns">' +
             '<button class="qbtn qbtn-maru" onclick="answerWB(\''+set+'\','+i+',true)">○</button>' +
             '<button class="qbtn qbtn-batu" onclick="answerWB(\''+set+'\','+i+',false)">×</button>' +
