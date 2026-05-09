@@ -582,8 +582,8 @@ function showTab(name, btn) {
 
 // ===== SECTION SYSTEM =====
 function showSection(num, btn) {
-  document.querySelectorAll('.lesson-group').forEach(g => g.classList.remove('active'));
-  document.querySelectorAll('.sec-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('#tab-dersler .lesson-group').forEach(g => g.classList.remove('active'));
+  document.querySelectorAll('#tab-dersler .section-btns .sec-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('section' + num).classList.add('active');
   btn.classList.add('active');
 }
@@ -593,7 +593,7 @@ function showSection(num, btn) {
 function showQSection(num, btn) {
   document.querySelectorAll('#tab-sorular .q-group').forEach(g => g.style.display = 'none');
   document.getElementById('qsection' + num).style.display = 'block';
-  document.querySelectorAll('#tab-sorular .sec-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('#tab-sorular .section-btns .sec-btn').forEach(b => b.classList.remove('active'));
   if (btn) btn.classList.add('active');
 }
 
